@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Морфемика: как устроено слово (для доски)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=PT+Serif:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#fbf8f2; --card:#ffffff; --ink:#23262f; --muted:#6b6f7b; --line:#e7e2d8;
+    --pre:#2f6fdb; --root:#1f9d55; --suf:#e07b12; --fsuf:#7a4fd6; --end:#d63a3a; --link:#8a8f9c;
+    --form:#7a4fd6; --form-bg:#f2ecff; --word:#0f8a7a; --word-bg:#e3f6f2;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:Nunito,system-ui,sans-serif;font-size:20px;line-height:1.5}
+  main{max-width:1180px;margin:0 auto;padding:26px 22px 70px}
+  h1{font-size:44px;line-height:1.1;margin:6px 0 6px;font-weight:800}
+  h2{font-size:32px;margin:0 0 14px;font-weight:800}
+  h3{font-size:23px;margin:20px 0 10px}
+  p{margin:0 0 12px}
+  .sub{color:var(--muted);margin-bottom:18px;font-size:21px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:26px 28px;margin:22px 0;box-shadow:0 2px 0 rgba(0,0,0,.03)}
+  .num{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;border-radius:50%;background:var(--ink);color:#fff;font-size:21px;margin-right:12px;vertical-align:4px}
+  nav.toc{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0 4px}
+  nav.toc a{font-size:17px;text-decoration:none;color:var(--ink);background:#fff;border:1px solid var(--line);padding:7px 15px;border-radius:999px;font-weight:700}
+  .rule{background:#fff3f3;border:2px dashed #e3a3a3;border-radius:16px;padding:16px 20px;margin:12px 0}
+  .rule b{color:#b3261e}
+  .remember{background:#fff8e1;border-left:6px solid #f2b400;padding:14px 18px;border-radius:12px;margin:14px 0;font-weight:700}
+  .note{font-size:17px;color:var(--muted)}
+  hr.sep{border:none;border-top:2px solid var(--form);opacity:.45;margin:14px 0 10px}
+  .special{background:#f4f1ea;border-radius:16px;padding:16px 20px;margin-top:14px}
+  .special h3{margin:0 0 8px}
+  .special ul{margin:6px 0 0;padding-left:24px}
+
+  /* ---------- Морфемы ---------- */
+  .w{font-family:"PT Serif",Georgia,serif;font-size:34px;letter-spacing:.5px;display:inline-flex;align-items:flex-end;white-space:nowrap}
+  .w.sm{font-size:24px}
+  .m{position:relative;display:inline-block;padding-top:14px;margin:0 1px;border-radius:6px;transition:background .3s,opacity .3s}
+  .m::before{content:"";position:absolute;left:0;right:0;top:0;height:12px;background-repeat:no-repeat;background-size:100% 100%}
+  .pre{color:var(--pre)}
+  .pre::before{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 20' preserveAspectRatio='none'%3E%3Cpolyline points='1,3 98,3 98,19' fill='none' stroke='%232f6fdb' stroke-width='2.5' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E")}
+  .root{color:var(--root)}
+  .root::before{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 20' preserveAspectRatio='none'%3E%3Cpath d='M2,19 Q50,-10 98,19' fill='none' stroke='%231f9d55' stroke-width='2.5' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E")}
+  .suf{color:var(--suf)}
+  .suf::before{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 20' preserveAspectRatio='none'%3E%3Cpolyline points='2,19 50,2 98,19' fill='none' stroke='%23e07b12' stroke-width='2.5' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E")}
+  .fsuf{color:var(--fsuf)}
+  .fsuf::before{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 20' preserveAspectRatio='none'%3E%3Cpolyline points='2,19 50,2 98,19' fill='none' stroke='%237a4fd6' stroke-width='2.5' stroke-dasharray='5 3' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E")}
+  .end{color:var(--end);border:2.5px solid var(--end);padding:0 4px;margin-left:3px;line-height:1.15;border-radius:3px;min-width:.8em;text-align:center}
+  .end::before{display:none}
+  .end.zero{min-width:.9em;height:1.15em}
+  .lnk{color:var(--link);border-bottom:2px dotted var(--link);line-height:1.1;border-radius:0}
+  .lnk::before{display:none}
+  .new{animation:glow 1.2s ease}
+  @keyframes glow{0%{transform:translateY(-16px) scale(1.25);opacity:0}60%{transform:translateY(2px) scale(1.05);opacity:1}100%{transform:none}}
+  .pop{animation:pop .55s ease}
+  @keyframes pop{0%{transform:scale(.4) rotate(-8deg);opacity:0}70%{transform:scale(1.18)}100%{transform:none;opacity:1}}
+  /* разбор в игре */
+  .chg{background:#fff1a8;box-shadow:0 0 0 4px #fff1a8;animation:pulse 1.4s ease 2}
+  .end.chg{background:#fff1a8}
+  @keyframes pulse{50%{box-shadow:0 0 0 9px #ffe066}}
+  .gone{background:#ffe0e0;box-shadow:0 0 0 4px #ffe0e0;text-decoration:line-through;text-decoration-color:#d63a3a;text-decoration-thickness:3px}
+  .keep{opacity:.55}
+
+  /* ---------- Таблицы ---------- */
+  .tbl{width:100%;border-collapse:separate;border-spacing:0;font-size:19px}
+  .tbl th{text-align:left;background:#f4f1ea;padding:11px 12px;font-weight:800}
+  .tbl td{padding:12px;border-top:1px solid var(--line);vertical-align:top}
+  .tbl th:first-child{border-top-left-radius:12px}.tbl th:last-child{border-top-right-radius:12px}
+  .tbl td.ex{white-space:nowrap}
+  .scroll{overflow-x:auto}
+  .legend{display:flex;flex-wrap:wrap;gap:14px 30px;margin:6px 0 4px}
+  .legend div{display:flex;align-items:flex-end;gap:10px;font-size:18px}
+  .verdict{display:inline-block;font-weight:800;font-size:16px;padding:4px 12px;border-radius:999px;white-space:nowrap}
+  .verdict.f{background:var(--form-bg);color:var(--form)}
+  .verdict.s{background:var(--word-bg);color:var(--word)}
+
+  /* ---------- Схема ---------- */
+  .scheme{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:10px 0 4px}
+  .blk{text-align:center;padding:12px 12px;border-radius:14px;min-width:110px}
+  .blk .t{font-family:"PT Serif",serif;font-size:42px;font-weight:700}
+  .blk .n{font-size:15px;font-weight:800;text-transform:uppercase;letter-spacing:.4px}
+  .blk .d{font-size:15px;color:var(--muted);line-height:1.25;margin-top:3px}
+  .b-pre{background:#e7efff;color:var(--pre)} .b-root{background:#e2f5ea;color:var(--root)}
+  .b-suf{background:#fff0dd;color:var(--suf)} .b-end{background:#ffe5e5;color:var(--end)}
+
+  /* ---------- Команды ---------- */
+  .teams{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .team{border-radius:18px;padding:18px}
+  .team.word{background:var(--word-bg);border:2px solid var(--word)}
+  .team.form{background:var(--form-bg);border:2px solid var(--form)}
+  .team h3{margin:0 0 8px}
+  .team.word h3{color:var(--word)} .team.form h3{color:var(--form)}
+  .team ul{margin:6px 0 0;padding-left:24px}
+  .team li{margin:4px 0}
+  @media (max-width:760px){.teams{grid-template-columns:1fr}}
+
+  /* ---------- Интерактив ---------- */
+  .lab{display:grid;grid-template-columns:1.15fr 1fr;gap:20px;align-items:stretch}
+  @media (max-width:760px){.lab{grid-template-columns:1fr}}
+  .stage{background:#faf7f1;border-radius:18px;padding:22px 14px;text-align:center;min-height:300px;display:flex;flex-direction:column;justify-content:center;gap:14px}
+  .stage .w{font-size:68px;justify-content:center}
+  .pic{background:#f6f2ea;border-radius:18px;padding:12px;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:8px}
+  .pic svg{width:100%;max-width:380px;height:auto;display:block;margin:0 auto}
+  .badge{display:inline-block;font-weight:800;font-size:18px;padding:7px 16px;border-radius:999px}
+  .badge.same{background:var(--form-bg);color:var(--form)}
+  .badge.diff{background:var(--word-bg);color:var(--word)}
+  .sent{font-family:"PT Serif",serif;font-size:28px}
+  .sent mark{background:#ffe7a8;padding:0 4px;border-radius:5px}
+  .case{font-size:19px;color:var(--muted);font-weight:800}
+  .chips{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 14px}
+  button{font:inherit;cursor:pointer}
+  .chip{border:2px solid var(--line);background:#fff;border-radius:999px;padding:8px 18px;font-weight:800;font-size:19px;color:var(--ink)}
+  .chip.on{border-color:var(--ink);background:var(--ink);color:#fff}
+  .btns{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+  .btn{border:none;border-radius:14px;padding:12px 18px;font-weight:800;font-size:19px}
+  .btn.f{background:var(--form-bg);color:var(--form)} .btn.f.on{background:var(--form);color:#fff}
+  .btn.s{background:var(--word-bg);color:var(--word)} .btn.s.on{background:var(--word);color:#fff}
+  .btn.g{background:#efece6;color:var(--ink)}
+  .btn:disabled{cursor:default}
+  .meaning{font-size:23px;font-weight:800}
+  .meaning span{font-weight:400;color:var(--muted)}
+  .fadepic{animation:fade .5s ease}
+  @keyframes fade{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:none}}
+
+  /* ---------- Игра ---------- */
+  .quiz{text-align:center}
+  .pair{font-family:"PT Serif",serif;font-size:56px;font-weight:700;margin:8px 0 18px}
+  .pair .arr{color:var(--muted);margin:0 18px}
+  .qbtns{display:flex;justify-content:center;gap:14px;flex-wrap:wrap}
+  .qbtns .btn{font-size:22px;padding:16px 26px}
+  .fb{margin-top:16px;font-weight:800;font-size:26px}
+  .fb.ok{color:var(--root)} .fb.no{color:var(--end)}
+  .score{font-size:18px;color:var(--muted);margin-bottom:8px;font-weight:700}
+  .bar{height:10px;background:#efece6;border-radius:9px;overflow:hidden;margin:0 auto 14px;max-width:420px}
+  .bar i{display:block;height:100%;background:var(--root);width:0;transition:width .4s}
+  .expl{margin:18px auto 0;max-width:860px;background:#faf7f1;border-radius:18px;padding:20px;text-align:center}
+  .expl .rowa{display:flex;justify-content:center;align-items:flex-end;gap:22px;flex-wrap:wrap}
+  .expl .w{font-size:48px}
+  .expl .arr{font-size:40px;color:var(--muted);padding-bottom:6px}
+  .what{margin-top:16px;display:flex;flex-direction:column;gap:6px;align-items:center}
+  .what div{font-size:21px}
+  .what .k{display:inline-block;min-width:150px;text-align:right;color:var(--muted);font-weight:700;margin-right:8px}
+  .concl{margin-top:14px;font-size:22px;font-weight:800}
+  .concl.f{color:var(--form)} .concl.s{color:var(--word)}
+  .keys{font-size:15px;color:var(--muted);margin-top:14px}
+  .hidden{display:none}
+  footer{text-align:center;color:var(--muted);font-size:15px;margin-top:24px}
+</style>
+</head>
+<body>
+<main>
+
+<h1>Как устроено слово</h1>
+<p class="sub">Морфемика и словообразование, русский язык, 6 класс (Баранов, Ладыженская)</p>
+<nav class="toc">
+  <a href="#rules">Правила</a><a href="#parts">Части слова</a><a href="#teams">Две команды морфем</a>
+  <a href="#forms">Окончание меняется</a><a href="#builder">Новые слова</a><a href="#check">Полная проверка</a><a href="#game">Игра</a>
+</nav>
+
+<!-- 1. Правила -->
+<section class="card" id="rules">
+  <h2><span class="num">1</span>Главные определения</h2>
+  <div class="rule">
+    <p><b>Морфемика</b> - это раздел лингвистики, в котором изучается, из каких значимых частей (морфем) состоит слово.</p>
+    <p><b>Словообразование</b> - это раздел лингвистики, в котором изучается, от каких слов и с помощью каких морфем образованы слова.</p>
+    <p style="margin:0"><b>Орфография</b> - это раздел лингвистики, в котором изучаются правила написания слов.</p>
+  </div>
+  <div class="remember">Вспомните: словообразующие морфемы служат для образования новых слов, формообразующие - для образования форм слова.</div>
+</section>
+
+<!-- 2. Части слова -->
+<section class="card" id="parts">
+  <h2><span class="num">2</span>Части слова (морфемы)</h2>
+  <div class="legend">
+    <div><span class="w sm"><span class="m pre">на</span></span> приставка</div>
+    <div><span class="w sm"><span class="m root">стен</span></span> корень</div>
+    <div><span class="w sm"><span class="m suf">н</span></span> суффикс</div>
+    <div><span class="w sm"><span class="m fsuf">л</span></span> формообразующий суффикс</div>
+    <div><span class="w sm"><span class="m end">ый</span></span> окончание</div>
+  </div>
+
+  <h3>Схема слова «настенный»</h3>
+  <div class="scheme">
+    <div class="blk b-pre"><div class="n">приставка</div><div class="t">на</div><div class="d">перед корнем</div></div>
+    <div class="blk b-root"><div class="n">корень</div><div class="t">стен</div><div class="d">главный смысл</div></div>
+    <div class="blk b-suf"><div class="n">суффикс</div><div class="t">н</div><div class="d">после корня</div></div>
+    <div class="blk b-end"><div class="n">окончание</div><div class="t">ый</div><div class="d">меняет форму</div></div>
+  </div>
+  <p class="note" style="text-align:center">Основа: <b>настенн</b> (всё слово без окончания)</p>
+
+  <div class="scroll" style="margin-top:12px">
+  <table class="tbl">
+    <tr><th>Часть слова</th><th>Определение из учебника</th><th>Пример</th></tr>
+    <tr><td><b style="color:var(--end)">Окончание</b></td>
+        <td>Изменяемая значимая часть слова, которая образует форму слова и служит для связи слов в словосочетании и предложении. Среди окончаний есть нулевые.</td>
+        <td class="ex"><span class="w sm"><span class="m root">стен</span><span class="m end">а</span></span>&nbsp; <span class="w sm"><span class="m root">дом</span><span class="m end zero"></span></span></td></tr>
+    <tr><td><b>Основа</b></td>
+        <td>Часть изменяемого слова без окончания или всё неизменяемое слово. В основе слова заключено его лексическое значение.</td>
+        <td class="ex"><i>настенн</i>(ый)<br><i>пальто</i></td></tr>
+    <tr><td><b style="color:var(--root)">Корень</b></td>
+        <td>Главная значимая часть слова, в которой заключено общее лексическое значение всех однокоренных слов.</td>
+        <td class="ex"><span class="w sm"><span class="m root">вод</span></span>: <i>вода, водопой</i></td></tr>
+    <tr><td><b style="color:var(--suf)">Суффикс</b></td>
+        <td>Значимая часть слова, которая находится после корня или после другого суффикса и служит для образования слов.</td>
+        <td class="ex"><span class="w sm"><span class="m root">дом</span><span class="m suf">ик</span><span class="m end zero"></span></span></td></tr>
+    <tr><td><b style="color:var(--pre)">Приставка</b></td>
+        <td>Значимая часть слова, которая находится перед корнем или перед другой приставкой и служит для образования слов.</td>
+        <td class="ex"><span class="w sm"><span class="m pre">под</span><span class="m root">окон</span><span class="m suf">ник</span><span class="m end zero"></span></span></td></tr>
+  </table>
+  </div>
+  <p class="note" style="margin-top:12px">Нулевое окончание (пустая рамка) не слышно, но оно есть: <i>дом - дом<b>а</b> - дом<b>у</b></i>. В сложных словах корни соединяет гласная о или е: <i>вод<u>о</u>пой</i>.</p>
+</section>
+
+<!-- 3. Форма или новое слово -->
+<section class="card" id="teams">
+  <h2><span class="num">3</span>Две команды морфем</h2>
+  <div class="teams">
+    <div class="team form">
+      <h3>Формообразующие морфемы</h3>
+      <p><b>Делают форму того же слова.</b> Смысл не меняется: меняются падеж, число, род, время, лицо.</p>
+      <ul>
+        <li>окончания: <i>стен<b>а</b>, стен<b>ы</b>, стен<b>ой</b></i></li>
+        <li>некоторые суффиксы: <i>чита<b>л</b></i>, <i>чита<b>ть</b></i>, <i>быстр<b>ее</b></i></li>
+      </ul>
+      <hr class="sep">
+      <p style="margin:0 0 4px"><b>А также:</b></p>
+      <ul>
+        <li>окончания прилагательных и глаголов: <i>весёл<b>ый</b> - весёл<b>ая</b></i>, <i>чита<b>ю</b> - чита<b>ешь</b></i></li>
+        <li>суффикс прошедшего времени <b>-л-</b>: <i>чита<b>л</b>, писа<b>л</b>а</i></li>
+        <li>суффиксы неопределённой формы <b>-ть, -ти</b>: <i>чита<b>ть</b>, нес<b>ти</b></i></li>
+        <li>суффиксы степеней сравнения <b>-ее-</b>, <b>-ейш-</b>: <i>красив<b>ее</b>, красив<b>ейш</b>ий</i></li>
+      </ul>
+      <p style="margin-top:10px"><span class="badge same">= то же слово</span></p>
+    </div>
+    <div class="team word">
+      <h3>Словообразующие морфемы</h3>
+      <p><b>Делают новое слово.</b> Оно означает уже что-то другое.</p>
+      <ul>
+        <li>приставки: <i><b>вы</b>ход, <b>на</b>стенный</i></li>
+        <li>почти все суффиксы: <i>дом<b>ик</b>, кот<b>ёнок</b>, чита<b>тель</b></i></li>
+        <li>суффикс <b>-ся</b>: <i>мыть - мыть<b>ся</b></i></li>
+      </ul>
+      <p style="margin-top:10px"><span class="badge diff">≠ новое слово</span></p>
+    </div>
+  </div>
+
+</section>
+
+<!-- 4. Формы -->
+<section class="card" id="forms">
+  <h2><span class="num">4</span>Окончание меняется, слово остаётся</h2>
+  <p>Окончание (и у глагола суффиксы -л-, -ть) меняется, а картинка остаётся той же. Это <b style="color:var(--form)">формообразующие</b> морфемы.</p>
+  <div class="chips" id="formChips"></div>
+  <div class="lab">
+    <div class="stage">
+      <div class="case" id="fCase"></div>
+      <div id="fWord"></div>
+      <div class="sent" id="fSent"></div>
+    </div>
+    <div class="pic">
+      <div id="fPic"></div>
+      <div><span class="badge same">Смысл не изменился: это то же слово</span></div>
+    </div>
+  </div>
+  <div class="btns">
+    <button class="btn g" id="fPlay">⏸ Пауза</button>
+    <button class="btn f" id="fNext">Следующая форма →</button>
+  </div>
+</section>
+
+<!-- 5. Новые слова -->
+<section class="card" id="builder">
+  <h2><span class="num">5</span>Добавим морфему - получим новое слово</h2>
+  <p>Нажми на кнопку с приставкой или суффиксом. Появится <b style="color:var(--word)">новое слово</b>, и картинка покажет, что оно значит что-то другое.</p>
+  <div class="chips" id="bChips"></div>
+  <div class="lab">
+    <div class="stage">
+      <div id="bWord"></div>
+      <div class="meaning" id="bMean"></div>
+    </div>
+    <div class="pic">
+      <div id="bPic"></div>
+      <div><span class="badge" id="bBadge"></span></div>
+    </div>
+  </div>
+  <div class="btns" id="bBtns"></div>
+</section>
+
+<!-- 6. Полная проверка -->
+<section class="card" id="check">
+  <h2><span class="num">6</span>Полная проверка: что меняется в слове</h2>
+  <div class="scroll">
+  <table class="tbl">
+    <tr><th>Что изменилось</th><th>Пример</th><th>Итог</th></tr>
+    <tr><td>Только окончание</td><td><i>окно → окна<br>весёлый → весёлая</i></td><td><span class="verdict f">форма</span></td></tr>
+    <tr><td>Формообразующий суффикс (-л-, -ть, -ее-, -ейш-)</td><td><i>читать → читал<br>красивый → красивее</i></td><td><span class="verdict f">форма</span></td></tr>
+    <tr><td>Гласная в корне выпала или чередуется, потому что слово изменилось</td><td><i>день → дня<br>стекло → стёкла</i></td><td><span class="verdict f">форма</span></td></tr>
+    <tr><td>Появилась приставка</td><td><i>ход → выход</i></td><td><span class="verdict s">новое слово</span></td></tr>
+    <tr><td>Появился словообразующий суффикс</td><td><i>кот → котёнок<br>лес → лесник</i></td><td><span class="verdict s">новое слово</span></td></tr>
+    <tr><td>Появились и приставка, и суффикс</td><td><i>окно → подоконник</i></td><td><span class="verdict s">новое слово</span></td></tr>
+    <tr><td>Добавился второй корень (сложение)</td><td><i>вода → водопой</i></td><td><span class="verdict s">новое слово</span></td></tr>
+    <tr><td>Суффикс убрали (бессуффиксный способ)</td><td><i>бегать → бег</i></td><td><span class="verdict s">новое слово</span></td></tr>
+    <tr><td>Слово перешло в другую часть речи, морфемы те же</td><td><i>столовая ложка<br>→ столовая (кафе)</i></td><td><span class="verdict s">новое слово</span></td></tr>
+  </table>
+  </div>
+  <div class="remember">Главная проверка: смысл остался прежним, изменились только падеж, число, род, время или лицо? Это форма. Слово стало обозначать что-то другое? Это новое слово.</div>
+  <div class="special">
+    <h3>* А ещё вам будет интересно: особый случай. Форма от другого корня.</h3>
+    <p>Иногда форма слова образуется от совсем другого корня. Корень новый, но смысл не изменился, поэтому это <b style="color:var(--form)">форма того же слова</b>, а не новое слово.</p>
+    <ul>
+      <li><i>человек → люди</i> (один человек, много людей)</li>
+      <li><i>ребёнок → дети</i></li>
+      <li><i>хороший → лучше</i> (сравнительная степень)</li>
+      <li><i>идти → шёл</i> (прошедшее время)</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 7. Игра -->
+<section class="card" id="game">
+  <h2><span class="num">7</span>Игра: форма или новое слово?</h2>
+  <div class="quiz">
+    <div class="score" id="qScore"></div>
+    <div class="bar"><i id="qBar"></i></div>
+    <div class="pair" id="qPair"></div>
+    <div class="qbtns" id="qBtns">
+      <button class="btn f" data-a="form">1 · Форма того же слова</button>
+      <button class="btn s" data-a="word">2 · Новое однокоренное слово</button>
+    </div>
+    <div class="fb" id="qFb"></div>
+    <div class="expl hidden" id="qExpl"></div>
+    <div class="btns" style="justify-content:center"><button class="btn g hidden" id="qNext">Дальше →</button></div>
+    <div class="keys">Клавиши: 1 или 2 - ответ, Enter - дальше</div>
+  </div>
+</section>
+
+<footer>Морфемика и словообразование · 6 класс</footer>
+</main>
+
+<script>
+/* ---------- разметка слова ---------- */
+function word(parts, cls){
+  return '<span class="w'+(cls?' '+cls:'')+'">'+parts.map(function(p){
+    var t=p[0], k=p[1], x=p[2]||'';
+    var c='m '+k+(k==='end'&&t===''?' zero':'')+(x?' '+x:'');
+    return '<span class="'+c+'">'+t+'</span>';
+  }).join('')+'</span>';
+}
+var uid=0;
+function bricks(){
+  var id='br'+(++uid);
+  return {def:'<pattern id="'+id+'" width="40" height="20" patternUnits="userSpaceOnUse"><rect width="40" height="20" fill="#c8664a"/><path d="M0 0H40M0 10H40M0 20H40M20 0V10M0 10V20M40 10V20" stroke="#efe1d4" stroke-width="2"/></pattern>', fill:'url(#'+id+')'};
+}
+
+/* ---------- картинки ---------- */
+var PIC={
+  wall:function(){var b=bricks();return '<svg viewBox="0 0 240 170"><defs>'+b.def+'</defs><rect x="20" y="20" width="200" height="130" rx="4" fill="'+b.fill+'"/><rect x="20" y="150" width="200" height="8" fill="#8a7b6a"/></svg>';},
+  clock:function(){var b=bricks();return '<svg viewBox="0 0 240 170"><defs>'+b.def+'</defs><rect x="20" y="20" width="200" height="130" rx="4" fill="'+b.fill+'"/><line x1="120" y1="26" x2="120" y2="44" stroke="#555" stroke-width="2"/><circle cx="120" cy="82" r="38" fill="#fff" stroke="#3b3b3b" stroke-width="6"/><g stroke="#3b3b3b" stroke-width="3" stroke-linecap="round"><line x1="120" y1="50" x2="120" y2="56"/><line x1="120" y1="108" x2="120" y2="114"/><line x1="88" y1="82" x2="94" y2="82"/><line x1="146" y1="82" x2="152" y2="82"/><line x1="120" y1="82" x2="120" y2="62"/><line x1="120" y1="82" x2="136" y2="90"/></g><circle cx="120" cy="82" r="3" fill="#d63a3a"/></svg>';},
+  house:function(s){return '<svg viewBox="0 0 240 170"><rect x="0" y="150" width="240" height="20" fill="#9fcf7f"/>'+
+    '<g transform="translate(36,150)"><circle cx="0" cy="-40" r="7" fill="#f2c9a0" stroke="#333" stroke-width="1.5"/><path d="M0-33V-14M0-14L-7 0M0-14L7 0M0-27L-9-19M0-27L9-19" stroke="#333" stroke-width="2.5" stroke-linecap="round" fill="none"/></g>'+
+    '<g transform="translate(145,150) scale('+s+')"><rect x="-40" y="-58" width="80" height="58" fill="#f3dfb5" stroke="#8a6a3a" stroke-width="2"/><polygon points="-50,-58 0,-98 50,-58" fill="#d65a3a" stroke="#8a3a2a" stroke-width="2"/><rect x="-10" y="-32" width="20" height="32" fill="#8a5a2a"/><rect x="-32" y="-46" width="16" height="16" fill="#9fd3f0" stroke="#8a6a3a" stroke-width="2"/><rect x="16" y="-46" width="16" height="16" fill="#9fd3f0" stroke="#8a6a3a" stroke-width="2"/></g>'+
+    '<text x="36" y="166" font-size="10" text-anchor="middle" fill="#3d5a2a" font-family="Nunito">человек</text></svg>';},
+  window:function(sill){return '<svg viewBox="0 0 240 170"><rect x="0" y="0" width="240" height="170" fill="#f1e7d2"/>'+
+    '<rect x="62" y="18" width="116" height="104" fill="#bfe3f7" stroke="#fff" stroke-width="10"/><rect x="62" y="18" width="116" height="104" fill="none" stroke="#9b8a6c" stroke-width="2"/><line x1="120" y1="18" x2="120" y2="122" stroke="#fff" stroke-width="7"/><line x1="62" y1="62" x2="178" y2="62" stroke="#fff" stroke-width="7"/><path d="M78 40 l14 -14 M86 46 l18 -18" stroke="#fff" stroke-width="3" opacity=".7"/>'+
+    (sill?'<rect x="48" y="124" width="144" height="13" rx="2" fill="#a86b32" stroke="#6b3f17" stroke-width="2"/><path d="M90 124 l4 -18 h18 l4 18z" fill="#c4643a"/><path d="M103 106 c-8 -14 -14 -14 -18 -22 M103 106 c4 -16 10 -18 16 -24 M103 106 v-26" stroke="#2f8a3a" stroke-width="3" fill="none"/><circle cx="103" cy="78" r="6" fill="#e84a7a"/><path d="M200 150 L184 136" stroke="#d63a3a" stroke-width="3"/><polygon points="180,132 190,134 184,141" fill="#d63a3a"/><text x="205" y="162" font-size="13" font-weight="800" fill="#d63a3a" font-family="Nunito" text-anchor="middle">вот он!</text>':'')+'</svg>';},
+  glass:function(small){if(!small)return '<svg viewBox="0 0 240 170"><rect x="50" y="15" width="140" height="140" fill="#cdeefc" stroke="#7aa9c0" stroke-width="5"/><path d="M70 60 l40 -40 M80 80 l60 -60 M150 140 l30 -30" stroke="#fff" stroke-width="5" opacity=".85"/></svg>';
+    return '<svg viewBox="0 0 240 170"><rect x="50" y="15" width="140" height="140" fill="none" stroke="#b9c7cf" stroke-width="2" stroke-dasharray="6 5"/><text x="120" y="40" text-anchor="middle" font-size="11" fill="#8a9aa3" font-family="Nunito">целое стекло</text><polygon points="104,88 140,78 132,114 110,108" fill="#cdeefc" stroke="#7aa9c0" stroke-width="3"/><path d="M114 96 l14 -8" stroke="#fff" stroke-width="3"/><circle cx="122" cy="96" r="34" fill="none" stroke="#e07b12" stroke-width="3"/><line x1="146" y1="120" x2="168" y2="142" stroke="#e07b12" stroke-width="6" stroke-linecap="round"/></svg>';},
+  smile:function(){return '<svg viewBox="0 0 240 170"><circle cx="120" cy="85" r="62" fill="#ffd34d" stroke="#e0a800" stroke-width="4"/><circle cx="98" cy="70" r="8" fill="#3b2a12"/><circle cx="142" cy="70" r="8" fill="#3b2a12"/><path d="M84 98 Q120 140 156 98" stroke="#3b2a12" stroke-width="7" fill="none" stroke-linecap="round"/><circle cx="80" cy="96" r="9" fill="#ff9a7a" opacity=".6"/><circle cx="160" cy="96" r="9" fill="#ff9a7a" opacity=".6"/></svg>';},
+  book:function(){return '<svg viewBox="0 0 240 170"><circle cx="120" cy="42" r="22" fill="#f2c9a0" stroke="#333" stroke-width="2"/><circle cx="112" cy="40" r="3" fill="#333"/><circle cx="128" cy="40" r="3" fill="#333"/><path d="M112 52 q8 5 16 0" stroke="#333" stroke-width="2" fill="none"/><path d="M98 30 q22 -26 44 0" fill="#6b4a2a"/>'+
+    '<path d="M120 92 C100 80 70 80 50 88 V150 C70 142 100 142 120 154Z" fill="#fff" stroke="#2f6fdb" stroke-width="4"/><path d="M120 92 C140 80 170 80 190 88 V150 C170 142 140 142 120 154Z" fill="#fff" stroke="#2f6fdb" stroke-width="4"/><g stroke="#9aa6b8" stroke-width="3"><line x1="62" y1="104" x2="108" y2="104"/><line x1="62" y1="116" x2="108" y2="116"/><line x1="62" y1="128" x2="100" y2="128"/><line x1="132" y1="104" x2="178" y2="104"/><line x1="132" y1="116" x2="178" y2="116"/><line x1="132" y1="128" x2="170" y2="128"/></g></svg>';},
+  cat:function(s){var g='<g transform="translate(120,150) scale('+s+')"><path d="M38 -22 q34 -6 26 -48" stroke="#e08a3a" stroke-width="9" fill="none" stroke-linecap="round"/><ellipse cx="10" cy="-24" rx="38" ry="24" fill="#f0a050"/><circle cx="-26" cy="-58" r="24" fill="#f0a050"/><polygon points="-46,-72 -42,-96 -28,-78" fill="#f0a050"/><polygon points="-22,-80 -8,-96 -6,-70" fill="#f0a050"/><circle cx="-34" cy="-60" r="4" fill="#222"/><circle cx="-18" cy="-60" r="4" fill="#222"/><path d="M-30 -50 q4 4 8 0" stroke="#222" stroke-width="2" fill="none"/><path d="M-12 -2 v-10 M24 -2 v-10" stroke="#d07a2a" stroke-width="6" stroke-linecap="round"/></g>';
+    return '<svg viewBox="0 0 240 170"><rect x="0" y="150" width="240" height="20" fill="#e9dcc6"/>'+g+(s<1?'<circle cx="190" cy="140" r="11" fill="#e84a7a"/><path d="M181 136 q9 8 18 0 M182 145 q9 -6 17 0" stroke="#fff" stroke-width="2" fill="none"/>':'')+'</svg>';},
+  steps:function(){var f='';[[50,140],[80,118],[110,132],[140,108],[170,122],[200,96]].forEach(function(p,i){f+='<ellipse cx="'+p[0]+'" cy="'+p[1]+'" rx="9" ry="14" transform="rotate(60 '+p[0]+' '+p[1]+')" fill="#6b5a4a" opacity="'+(0.45+i*0.1)+'"/>';});
+    return '<svg viewBox="0 0 240 170"><rect width="240" height="170" fill="#f1e7d2"/>'+f+'<path d="M40 60 H190" stroke="#1f9d55" stroke-width="5"/><polygon points="196,60 182,51 182,69" fill="#1f9d55"/></svg>';},
+  door:function(out){var arrow=out?'<path d="M128 128 H210" stroke="#d63a3a" stroke-width="7"/><polygon points="220,128 204,118 204,138" fill="#d63a3a"/>':'<path d="M222 128 H140" stroke="#1f9d55" stroke-width="7"/><polygon points="130,128 146,118 146,138" fill="#1f9d55"/>';
+    return '<svg viewBox="0 0 240 170"><rect x="10" y="10" width="160" height="150" fill="#e8dfcf" stroke="#b8a888" stroke-width="2"/><rect x="58" y="62" width="64" height="98" fill="#8a5a2a" stroke="#5a3a1a" stroke-width="3"/><circle cx="110" cy="112" r="4" fill="#f2c94c"/><rect x="50" y="26" width="80" height="26" rx="4" fill="'+(out?'#d63a3a':'#1f9d55')+'"/><text x="90" y="45" text-anchor="middle" font-size="16" font-weight="800" fill="#fff" font-family="Nunito">'+(out?'ВЫХОД':'ВХОД')+'</text>'+arrow+'</svg>';}
+};
+
+/* ---------- 4. Формы ---------- */
+var FORMS={
+  'стена':{pic:function(){return PIC.wall()},list:[
+    ['Именительный падеж',[['стен','root'],['а́','end','pop']],'Это высокая <mark>стена́</mark>.'],
+    ['Родительный падеж',[['стен','root'],['ы́','end','pop']],'У сарая нет <mark>стены́</mark>.'],
+    ['Дательный падеж',[['стен','root'],['е́','end','pop']],'Подойди к <mark>стене́</mark>.'],
+    ['Винительный падеж',[['сте́н','root'],['у','end','pop']],'Мы покрасили <mark>сте́ну</mark>.'],
+    ['Творительный падеж',[['стен','root'],['о́й','end','pop']],'Дом с кирпичной <mark>стено́й</mark>.'],
+    ['Предложный падеж',[['стен','root'],['е́','end','pop']],'Картина висит на <mark>стене́</mark>.']]},
+  'дом':{pic:function(){return PIC.house(1)},list:[
+    ['Именительный падеж',[['дом','root'],['','end','pop']],'Это наш <mark>дом</mark>.'],
+    ['Родительный падеж',[['до́м','root'],['а','end','pop']],'Около <mark>до́ма</mark> растёт клён.'],
+    ['Дательный падеж',[['до́м','root'],['у','end','pop']],'Подходим к <mark>до́му</mark>.'],
+    ['Творительный падеж',[['до́м','root'],['ом','end','pop']],'Любуемся <mark>до́мом</mark>.'],
+    ['Предложный падеж',[['до́м','root'],['е','end','pop']],'Думаю о <mark>до́ме</mark>.']]},
+  'окно':{pic:function(){return PIC.window(false)},list:[
+    ['Именительный падеж',[['окн','root'],['о́','end','pop']],'Это большое <mark>окно́</mark>.'],
+    ['Родительный падеж',[['окн','root'],['а́','end','pop']],'Из <mark>окна́</mark> дует.'],
+    ['Дательный падеж',[['окн','root'],['у́','end','pop']],'Подойди к <mark>окну́</mark>.'],
+    ['Творительный падеж',[['окн','root'],['о́м','end','pop']],'Кот сидит под <mark>окно́м</mark>.'],
+    ['Предложный падеж',[['окн','root'],['е́','end','pop']],'Расскажи об <mark>окне́</mark>.']]},
+  'весёлый':{pic:function(){return PIC.smile()},list:[
+    ['Мужской род',[['весёл','root'],['ый','end','pop']],'<mark>Весёлый</mark> клоун.'],
+    ['Женский род',[['весёл','root'],['ая','end','pop']],'<mark>Весёлая</mark> песня.'],
+    ['Средний род',[['весёл','root'],['ое','end','pop']],'<mark>Весёлое</mark> утро.'],
+    ['Множественное число',[['весёл','root'],['ые','end','pop']],'<mark>Весёлые</mark> дети.'],
+    ['Родительный падеж',[['весёл','root'],['ого','end','pop']],'Не видно <mark>весёлого</mark> клоуна.']]},
+  'читать':{pic:function(){return PIC.book()},list:[
+    ['Неопределённая форма',[['чит','root'],['а́','suf'],['ть','fsuf','pop']],'Я люблю <mark>чита́ть</mark>.'],
+    ['Настоящее время, 1 лицо',[['чит','root'],['а́','suf'],['ю','end','pop']],'Я <mark>чита́ю</mark> книгу.'],
+    ['Настоящее время, 2 лицо',[['чит','root'],['а́','suf'],['ешь','end','pop']],'Ты <mark>чита́ешь</mark> книгу.'],
+    ['Настоящее время, 3 лицо',[['чит','root'],['а́','suf'],['ет','end','pop']],'Он <mark>чита́ет</mark> книгу.'],
+    ['Прошедшее время, муж. род',[['чит','root'],['а́','suf'],['л','fsuf','pop'],['','end','pop']],'Вчера он <mark>чита́л</mark> книгу.'],
+    ['Прошедшее время, жен. род',[['чит','root'],['а́','suf'],['л','fsuf','pop'],['а','end','pop']],'Вчера она <mark>чита́ла</mark> книгу.']]}
+};
+var fKey='стена', fIdx=0, fTimer=null, fPlaying=true;
+var fChips=document.getElementById('formChips');
+Object.keys(FORMS).forEach(function(k){
+  var b=document.createElement('button');b.className='chip';b.textContent=k;
+  b.onclick=function(){fKey=k;fIdx=0;drawFChips();renderForm(true);restart();};
+  fChips.appendChild(b);
+});
+function drawFChips(){[].forEach.call(fChips.children,function(c){c.classList.toggle('on',c.textContent===fKey)});}
+function renderForm(newPic){
+  var f=FORMS[fKey], r=f.list[fIdx];
+  document.getElementById('fCase').textContent=r[0];
+  document.getElementById('fWord').innerHTML=word(r[1]);
+  document.getElementById('fSent').innerHTML=r[2];
+  if(newPic){var p=document.getElementById('fPic');p.innerHTML=f.pic();p.classList.remove('fadepic');void p.offsetWidth;p.classList.add('fadepic');}
+}
+function step(){fIdx=(fIdx+1)%FORMS[fKey].list.length;renderForm(false);}
+function restart(){clearInterval(fTimer);if(fPlaying)fTimer=setInterval(step,2600);}
+document.getElementById('fNext').onclick=function(){step();restart();};
+document.getElementById('fPlay').onclick=function(){fPlaying=!fPlaying;this.textContent=fPlaying?'⏸ Пауза':'▶ Запустить';restart();};
+drawFChips();renderForm(true);restart();
+
+/* ---------- 5. Новые слова ---------- */
+var BUILD={
+  'дом':[
+    {parts:[['дом','root'],['','end']],mean:'дом',sub:'здание, в котором живут',pic:function(){return PIC.house(1)}},
+    {btn:'+ суффикс -ик-',parts:[['до́м','root'],['ик','suf','new'],['','end']],mean:'до́мик',sub:'маленький дом',pic:function(){return PIC.house(.55)}},
+    {btn:'+ суффикс -ищ-',parts:[['дом','root'],['и́щ','suf','new'],['е','end']],mean:'доми́ще',sub:'огромный дом',pic:function(){return PIC.house(1.4)}}],
+  'окно':[
+    {parts:[['окн','root'],['о́','end']],mean:'окно́',sub:'проём в стене со стеклом',pic:function(){return PIC.window(false)}},
+    {btn:'+ приставка под- и суффикс -ник-',parts:[['под','pre','new'],['око́н','root'],['ник','suf','new'],['','end']],mean:'подоко́нник',sub:'доска под окном',pic:function(){return PIC.window(true)}}],
+  'стена':[
+    {parts:[['стен','root'],['а́','end']],mean:'стена́',sub:'предмет: часть дома',pic:function(){return PIC.wall()}},
+    {btn:'+ приставка на- и суффикс -н-',parts:[['на','pre','new'],['сте́н','root'],['н','suf','new'],['ый','end']],mean:'насте́нный',sub:'признак: висит на стене (настенные часы)',pic:function(){return PIC.clock()}}],
+  'стекло':[
+    {parts:[['стекл','root'],['о́','end']],mean:'стекло́',sub:'целое стекло',pic:function(){return PIC.glass(false)}},
+    {btn:'+ суффикс -ышк-',parts:[['стёкл','root'],['ышк','suf','new'],['о','end']],mean:'стёклышко',sub:'маленький кусочек стекла',pic:function(){return PIC.glass(true)}}],
+  'кот':[
+    {parts:[['кот','root'],['','end']],mean:'кот',sub:'взрослое животное',pic:function(){return PIC.cat(1)}},
+    {btn:'+ суффикс -ёнок-',parts:[['кот','root'],['ёнок','suf','new'],['','end']],mean:'котёнок',sub:'детёныш кошки',pic:function(){return PIC.cat(.55)}}],
+  'ход':[
+    {parts:[['ход','root'],['','end']],mean:'ход',sub:'движение, ходьба',pic:function(){return PIC.steps()}},
+    {btn:'+ приставка в-',parts:[['в','pre','new'],['ход','root'],['','end']],mean:'вход',sub:'место, через которое входят',pic:function(){return PIC.door(false)}},
+    {btn:'+ приставка вы-',parts:[['вы́','pre','new'],['ход','root'],['','end']],mean:'вы́ход',sub:'место, через которое выходят',pic:function(){return PIC.door(true)}}]
+};
+var bKey='дом', bIdx=0;
+var bChips=document.getElementById('bChips');
+Object.keys(BUILD).forEach(function(k){
+  var b=document.createElement('button');b.className='chip';b.textContent=k;
+  b.onclick=function(){bKey=k;bIdx=0;renderB();};bChips.appendChild(b);
+});
+function renderB(){
+  [].forEach.call(bChips.children,function(c){c.classList.toggle('on',c.textContent===bKey)});
+  var list=BUILD[bKey], s=list[bIdx];
+  document.getElementById('bWord').innerHTML=word(s.parts);
+  document.getElementById('bMean').innerHTML=s.mean+' <span>: '+s.sub+'</span>';
+  var p=document.getElementById('bPic');p.innerHTML=s.pic();p.classList.remove('fadepic');void p.offsetWidth;p.classList.add('fadepic');
+  var bd=document.getElementById('bBadge');
+  if(bIdx===0){bd.className='badge same';bd.textContent='Исходное слово';}
+  else{bd.className='badge diff';bd.textContent='Новое слово! Смысл изменился';}
+  var box=document.getElementById('bBtns');box.innerHTML='';
+  list.forEach(function(it,i){
+    var b=document.createElement('button');
+    b.className='btn '+(i===0?'g':'s')+(i===bIdx&&i>0?' on':'');
+    b.textContent=i===0?'↺ Исходное слово':it.btn;
+    b.onclick=function(){bIdx=i;renderB();};box.appendChild(b);
+  });
+}
+renderB();
+
+/* ---------- 6. Игра ---------- */
+/* a, b: морфемы; флаг 'chg' - изменилось или появилось, 'gone' - исчезло, 'keep' - осталось как было.
+   w: [корень, приставка, суффикс, окончание] - строки для таблички «что изменилось» */
+var Q=[
+  {a:[['стен','root','keep'],['а','end','chg']],b:[['стен','root','keep'],['ы','end','chg']],t:'form',
+   w:['тот же','нет','нет','-а → -ы'],c:'Изменилось только окончание. Это та же стена, только в другом падеже.'},
+  {a:[['стен','root','keep'],['а','end']],b:[['на','pre','chg'],['стен','root','keep'],['н','suf','chg'],['ый','end']],t:'word',
+   w:['тот же','появилась на-','появился -н-','-а → -ый'],c:'Появились приставка и суффикс. Был предмет, стал признак: «такой, что висит на стене».'},
+  {a:[['дом','root','keep'],['','end']],b:[['дом','root','keep'],['ик','suf','chg'],['','end']],t:'word',
+   w:['тот же','нет','появился -ик-','нулевое'],c:'Появился суффикс -ик-. Домик - это маленький дом, новое слово.'},
+  {a:[['дом','root','keep'],['','end','chg']],b:[['дом','root','keep'],['ом','end','chg']],t:'form',
+   w:['тот же','нет','нет','∅ → -ом'],c:'Изменилось только окончание. Тот же дом, творительный падеж.'},
+  {a:[['окн','root','keep'],['о','end','chg']],b:[['окн','root','keep'],['а','end','chg']],t:'form',
+   w:['тот же','нет','нет','-о → -а'],c:'Изменилось только окончание: то же окно (или много окон).'},
+  {a:[['окн','root','keep'],['о','end']],b:[['под','pre','chg'],['окон','root','keep'],['ник','suf','chg'],['','end']],t:'word',
+   w:['тот же (окн/окон)','появилась под-','появился -ник-','-о → ∅'],c:'Появились приставка под- и суффикс -ник-. Подоконник - это доска под окном.'},
+  {a:[['стекл','root','keep'],['о','end','chg']],b:[['стекл','root','keep'],['ом','end','chg']],t:'form',
+   w:['тот же','нет','нет','-о → -ом'],c:'Изменилось только окончание. Это то же стекло.'},
+  {a:[['стекл','root','keep'],['о','end']],b:[['стёкл','root','keep'],['ышк','suf','chg'],['о','end']],t:'word',
+   w:['тот же (е/ё)','нет','появился -ышк-','-о'],c:'Появился суффикс -ышк-. Стёклышко - маленький кусочек стекла.'},
+  {a:[['вод','root','keep'],['а','end','chg']],b:[['вод','root','keep'],['ой','end','chg']],t:'form',
+   w:['тот же','нет','нет','-а → -ой'],c:'Изменилось только окончание. Та же вода.'},
+  {a:[['вод','root','keep'],['а','end']],b:[['вод','root','keep'],['о','lnk','chg'],['пой','root','chg'],['','end']],t:'word',
+   w:['вод + второй корень пой','нет','нет','-а → ∅'],c:'Добавился второй корень. Это сложное слово: место, где животных поят водой.'},
+  {a:[['кот','root','keep'],['','end']],b:[['кот','root','keep'],['ёнок','suf','chg'],['','end']],t:'word',
+   w:['тот же','нет','появился -ёнок-','нулевое'],c:'Появился суффикс -ёнок-. Котёнок - детёныш, это новое слово.'},
+  {a:[['кот','root','keep'],['','end','chg']],b:[['кот','root','keep'],['ы','end','chg']],t:'form',
+   w:['тот же','нет','нет','∅ → -ы'],c:'Изменилось только окончание. Те же коты, только их много.'},
+  {a:[['ход','root','keep'],['','end']],b:[['вы','pre','chg'],['ход','root','keep'],['','end']],t:'word',
+   w:['тот же','появилась вы-','нет','нулевое'],c:'Появилась приставка вы-. Выход - место, через которое выходят.'},
+  {a:[['лес','root','keep'],['','end']],b:[['лес','root','keep'],['ник','suf','chg'],['','end']],t:'word',
+   w:['тот же','нет','появился -ник-','нулевое'],c:'Появился суффикс -ник-. Лесник - человек, который охраняет лес.'},
+  {a:[['весёл','root','keep'],['ый','end','chg']],b:[['весёл','root','keep'],['ая','end','chg']],t:'form',
+   w:['тот же','нет','нет','-ый → -ая'],c:'Изменилось только окончание: мужской род стал женским. Смысл тот же.'},
+  {a:[['син','root','keep'],['ий','end','chg']],b:[['син','root','keep'],['его','end','chg']],t:'form',
+   w:['тот же','нет','нет','-ий → -его'],c:'Изменилось только окончание. Тот же цвет, другой падеж.'},
+  {a:[['син','root','keep'],['ий','end']],b:[['син','root','keep'],['ев','suf','chg'],['а','end']],t:'word',
+   w:['тот же','нет','появился -ев-','-ий → -а'],c:'Появился суффикс -ев-. Синева - это уже предмет: синий цвет неба или моря.'},
+  {a:[['крас','root','keep'],['ив','suf','keep'],['ый','end','gone']],b:[['крас','root','keep'],['ив','suf','keep'],['ее','fsuf','chg']],t:'form',
+   w:['тот же','нет','появился -ее- (формообразующий)','-ый ушло'],c:'Суффикс -ее- образует сравнительную степень. Это форма того же прилагательного: красивый → красивее.'},
+  {a:[['чит','root','keep'],['а','suf','keep'],['ть','fsuf','gone']],b:[['чит','root','keep'],['а','suf','keep'],['л','fsuf','chg'],['','end','chg']],t:'form',
+   w:['тот же','нет','-ть → -л- (оба формообразующие)','нулевое'],c:'Суффикс -л- образует прошедшее время. Это форма того же глагола.'},
+  {a:[['чит','root','keep'],['а','suf','keep'],['ть','fsuf','gone']],b:[['чит','root','keep'],['а','suf','keep'],['ю','end','chg']],t:'form',
+   w:['тот же','нет','нет','появилось -ю'],c:'Изменилось окончание: глагол в настоящем времени, 1 лицо. Действие то же.'},
+  {a:[['чит','root','keep'],['а','suf','keep'],['ть','fsuf']],b:[['чит','root','keep'],['а','suf','keep'],['тель','suf','chg'],['','end']],t:'word',
+   w:['тот же','нет','появился -тель-','нулевое'],c:'Появился суффикс -тель-. Было действие, стал человек, который читает.'},
+  {a:[['бег','root','keep'],['а','suf','gone'],['ть','fsuf','gone']],b:[['бег','root','keep'],['','end','chg']],t:'word',
+   w:['тот же','нет','суффикс убрали','нулевое'],c:'Суффикс убрали, и получилось новое слово: был глагол бегать, стал предмет бег. Это бессуффиксный способ.'},
+  {a:[['мы','root','keep'],['ть','fsuf','keep']],b:[['мы','root','keep'],['ть','fsuf','keep'],['ся','suf','chg']],t:'word',
+   w:['тот же','нет','появился -ся','нет'],c:'Появился суффикс -ся. Мыть (кого-то) и мыться (себя) - разные слова.'},
+  {a:[['день','root','chg'],['','end','chg']],b:[['дн','root','chg'],['я','end','chg']],t:'form',
+   w:['тот же (гласная е выпала)','нет','нет','∅ → -я'],c:'Хитрый случай! Гласная в корне выпала, но это та же форма слова «день»: родительный падеж.'},
+  {a:[['человек','root','chg'],['','end']],b:[['люд','root','chg'],['и','end','chg']],t:'form',
+   w:['другой корень!','нет','нет','∅ → -и'],c:'Особый случай: множественное число слова «человек» образуется от другого корня. Но это форма того же слова.'},
+  {a:[['человек','root','keep'],['','end']],b:[['человеч','root','keep'],['еск','suf','chg'],['ий','end']],t:'word',
+   w:['тот же (к/ч)','нет','появился -еск-','∅ → -ий'],c:'Появился суффикс -еск-. Было существительное, стало прилагательное: новое слово.'},
+  {a:[['стол','root','keep'],['ов','suf','keep'],['ая','end','keep']],b:[['стол','root','keep'],['ов','suf','keep'],['ая','end','keep']],pa:'столовая (ложка)',pb:'столовая (кафе)',t:'word',
+   w:['тот же','нет','тот же','тот же'],c:'Морфемы не изменились, но прилагательное стало существительным: «столовая» - место, где обедают. Это новое слово (переход в другую часть речи).'}
+];
+// плоское слово без разметки
+function plain(parts){return parts.map(function(p){return p[0]}).join('');}
+function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+var ROUND=12, qList, qI, qOk, qDone, qAnswered;
+function newRound(){qList=shuffle(Q.slice()).slice(0,ROUND);qI=0;qOk=0;qDone=false;qRender();}
+function setBtns(dis){document.querySelectorAll('#qBtns .btn').forEach(function(b){b.disabled=dis;b.classList.remove('on');b.style.opacity=dis?'.6':'1'});}
+function qRender(){
+  qAnswered=false;
+  var fb=document.getElementById('qFb');fb.textContent='';fb.className='fb';
+  document.getElementById('qExpl').classList.add('hidden');
+  document.getElementById('qNext').classList.add('hidden');
+  setBtns(false);
+  if(qI>=qList.length){
+    document.getElementById('qPair').innerHTML='🎉 '+qOk+' из '+qList.length;
+    fb.textContent=qOk>=10?'Отлично! Ты разобрался в морфемах.':'Неплохо! Сыграем ещё раз?';fb.className='fb ok';
+    setBtns(true);
+    var n=document.getElementById('qNext');n.textContent='Новый раунд (другие слова)';n.classList.remove('hidden');qDone=true;
+  } else {
+    var q=qList[qI];
+    document.getElementById('qPair').innerHTML=(q.pa||plain(q.a))+'<span class="arr">→</span>'+(q.pb||plain(q.b));
+  }
+  document.getElementById('qScore').textContent='Вопрос '+Math.min(qI+1,qList.length)+' из '+qList.length+' · верно: '+qOk;
+  document.getElementById('qBar').style.width=(qI/qList.length*100)+'%';
+}
+function answer(a){
+  if(qAnswered||qDone)return;
+  qAnswered=true;
+  var q=qList[qI], ok=a===q.t;
+  if(ok)qOk++;
+  document.querySelectorAll('#qBtns .btn').forEach(function(b){b.disabled=true;if(b.dataset.a===a)b.classList.add('on');else b.style.opacity='.5';});
+  var fb=document.getElementById('qFb');
+  fb.className='fb '+(ok?'ok':'no');
+  fb.textContent=(ok?'✓ Верно!':'✗ Не совсем.')+' Это '+(q.t==='form'?'форма того же слова.':'новое однокоренное слово.');
+  var ex=document.getElementById('qExpl');
+  ex.innerHTML='<div class="rowa">'+word(q.a)+'<span class="arr">→</span>'+word(q.b)+'</div>'+
+    '<div class="what">'+
+      '<div><span class="k">Корень:</span>'+q.w[0]+'</div>'+
+      '<div><span class="k">Приставка:</span>'+q.w[1]+'</div>'+
+      '<div><span class="k">Суффикс:</span>'+q.w[2]+'</div>'+
+      '<div><span class="k">Окончание:</span>'+q.w[3]+'</div>'+
+    '</div>'+
+    '<div class="concl '+(q.t==='form'?'f':'s')+'">'+q.c+'</div>'+
+    '<div class="note" style="margin-top:10px">Жёлтым подсвечено то, что изменилось или появилось, красным зачёркнуто то, что исчезло, бледным - то, что осталось как было.</div>';
+  ex.classList.remove('hidden');
+  var n=document.getElementById('qNext');n.textContent=qI===qList.length-1?'Итоги →':'Дальше →';n.classList.remove('hidden');
+  document.getElementById('qScore').textContent='Вопрос '+(qI+1)+' из '+qList.length+' · верно: '+qOk;
+}
+function next(){
+  if(qDone){newRound();return;}
+  if(!qAnswered)return;
+  qI++;qRender();
+}
+document.querySelectorAll('#qBtns .btn').forEach(function(b){b.onclick=function(){answer(b.dataset.a)};});
+document.getElementById('qNext').onclick=next;
+document.addEventListener('keydown',function(e){
+  var g=document.getElementById('game').getBoundingClientRect();
+  if(g.bottom<0||g.top>window.innerHeight)return;
+  if(e.key==='1')answer('form');
+  else if(e.key==='2')answer('word');
+  else if(e.key==='Enter'){e.preventDefault();next();}
+});
+newRound();
+</script>
+</body>
+</html>
