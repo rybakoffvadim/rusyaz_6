@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Строение семени: интерактивный урок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Rubik:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#f7f2e6;--card:#fffdf7;--ink:#2b2822;--muted:#6e675a;--green:#3d7a37;--green2:#e3f0d6;--line:#e4dccb;
+--cot:#f2c14e;--root:#d9825b;--stem:#a8d672;--bud:#3f9a4f;--endo:#fff1c4;--coat:#7a3b22}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:Nunito,system-ui,sans-serif;font-size:17px;line-height:1.5}
+h1,h2,h3{font-family:Rubik,Nunito,system-ui,sans-serif;line-height:1.15;margin:0}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+header{padding:34px 0 8px}
+.tag{display:inline-block;background:var(--green2);color:var(--green);font-weight:800;font-size:13px;letter-spacing:.06em;text-transform:uppercase;padding:5px 12px;border-radius:999px}
+header h1{font-size:clamp(30px,5vw,50px);margin:12px 0 8px;font-weight:800}
+header p{max-width:720px;color:var(--muted);margin:0}
+section{padding:24px 0}
+.sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.num{font-family:Rubik,system-ui,sans-serif;font-weight:800;color:#fff;background:var(--green);width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-size:17px;flex:none;transform:translateY(4px)}
+.sec-head h2{font-size:28px}
+.sec-head p{flex-basis:100%;margin:2px 0 0 46px;color:var(--muted)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;box-shadow:0 12px 30px -20px rgba(60,40,0,.3)}
+
+/* idea */
+.idea{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.idea .card{padding:18px;display:flex;flex-direction:column;gap:8px}
+.idea svg{width:100%;height:120px}
+.idea h3{font-size:20px}
+.idea p{margin:0;color:var(--muted);font-size:16px}
+.plus{font-family:Rubik;font-weight:800;color:var(--muted)}
+.analogy{margin-top:14px;padding:14px 18px;border-radius:16px;background:#fff7e0;border:1px dashed #e2c98b}
+
+/* lab */
+.tabs{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.tab{cursor:pointer;border:2px solid var(--line);background:var(--card);border-radius:16px;padding:8px 16px 8px 10px;display:flex;align-items:center;gap:10px;font:inherit;font-weight:800;color:var(--ink)}
+.tab small{display:block;font-weight:600;color:var(--muted);font-size:13px;line-height:1.1}
+.tab svg{width:44px;height:34px;flex:none}
+.tab.on{border-color:var(--green);background:#f3f9ec;box-shadow:0 0 0 3px rgba(61,122,55,.12)}
+.lab{display:grid;grid-template-columns:1fr 1fr;overflow:hidden}
+.full{grid-column:1/-1}
+.vhd{font-family:Rubik,Nunito,system-ui,sans-serif;font-weight:700;font-size:17px;padding:4px 6px 2px;display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline}
+.vhd small{font-family:Nunito,system-ui,sans-serif;font-weight:700;font-size:13px;color:var(--muted)}
+.stage{background:radial-gradient(circle at 50% 45%,#fff 0,#faf5e9 70%);border-right:1px solid var(--line);padding:12px 10px}
+.stage svg{width:100%;height:auto;display:block}
+.v3d{padding:12px 10px;background:radial-gradient(circle at 50% 40%,#ffffff 0,#efe9dc 75%);position:relative}
+.v3d canvas{display:block;margin:0 auto;touch-action:none;cursor:grab}
+.v3fail[hidden]{display:none}
+.v3fail{position:absolute;inset:60px 20px;display:grid;place-items:center;text-align:center;color:var(--muted);font-weight:700}
+.depth{padding:12px 22px 4px;border-top:1px solid var(--line)}
+.depth input{width:100%;accent-color:var(--green);height:26px}
+.stops{display:flex;justify-content:space-between;gap:4px}
+.stop{cursor:pointer;border:none;background:none;font:inherit;font-size:14px;font-weight:800;color:var(--muted);padding:2px 0;text-align:center;flex:1}
+.stop.on{color:var(--green)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;font-weight:700;color:var(--muted);padding:8px 8px 0}
+.legend i{display:inline-block;width:13px;height:13px;border-radius:4px;vertical-align:-2px;margin-right:5px;border:1px solid rgba(0,0,0,.2)}
+.panel{padding:18px 24px 22px;display:grid;grid-template-columns:1.25fr 1fr;gap:22px;border-top:1px solid var(--line)}
+.ptext,.pside{display:flex;flex-direction:column;gap:12px}
+.kicker{font-size:13px;font-weight:800;color:var(--green);text-transform:uppercase;letter-spacing:.06em}
+.panel h3{font-size:24px}
+.panel .txt{margin:0}
+.info{border-radius:16px;background:#fbefd2;padding:14px 16px;border:1px dashed #e2c98b;min-height:88px}
+.info b{font-family:Rubik,Nunito,system-ui,sans-serif;font-size:18px;display:block;margin-bottom:2px}
+.info.empty{color:var(--muted);background:#faf6ec;border-color:var(--line)}
+.nav{display:flex;gap:10px;margin-top:auto;flex-wrap:wrap}
+.btn{cursor:pointer;font:inherit;font-weight:800;border-radius:14px;padding:12px 18px;border:2px solid var(--ink);background:var(--ink);color:#fff}
+.btn.ghost{background:transparent;color:var(--ink)}
+.btn[disabled]{opacity:.35;cursor:default}
+.btn.go{flex:1}
+.chip{cursor:pointer;font:inherit;font-size:14px;font-weight:800;border-radius:999px;padding:6px 12px;border:2px solid #c9c3ea;background:#fff;color:#3d3590;align-self:flex-start}
+.chip.on{background:#3d3590;color:#fff}
+.lbl{cursor:pointer}
+.lbl line{stroke:#2b2822;stroke-width:1.6;stroke-dasharray:3 3}
+.lbl circle{fill:#fff;stroke:#2b2822;stroke-width:2.2}
+.lbl rect.pill{fill:#fff;stroke:#2b2822;stroke-width:2}
+.lbl text{font-family:Nunito,system-ui,sans-serif;font-weight:800;font-size:15px;fill:#2b2822}
+.lbl:hover rect.pill,.lbl.act rect.pill{fill:#2b2822}
+.lbl:hover text,.lbl.act text{fill:#fff}
+
+/* two ways */
+.ways{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.ways .card{padding:18px}
+.ways svg{width:100%;height:auto;max-height:230px}
+.ways h3{font-size:21px;margin-bottom:6px}
+.ways p{margin:6px 0 0}
+.note{margin-top:14px;padding:16px 18px;border-radius:16px;background:var(--green2)}
+.remember{margin-top:14px;padding:18px 20px;border-radius:18px;background:#2b2822;color:#fff}
+.remember b{color:#f2c75c}
+
+/* growth */
+.grow{padding:22px}
+.grow-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.gpanel{border:1px solid var(--line);border-radius:18px;padding:14px;background:#fffefa}
+.gpanel h3{font-size:20px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.gpanel h3 small{font-family:Nunito,system-ui,sans-serif;font-size:14px;color:var(--muted);font-weight:700}
+.gpanel svg{width:100%;height:auto;display:block}
+.bars{display:grid;gap:6px;font-size:14px;font-weight:700}
+.bar{display:grid;grid-template-columns:96px 1fr 44px;gap:8px;align-items:center}
+.bar .tr{height:12px;border-radius:99px;background:#efe9da;overflow:hidden}
+.bar .fl{height:100%;border-radius:99px}
+.bar .v{text-align:right;color:var(--muted)}
+.ctrl{display:flex;gap:14px;align-items:center;margin:18px 0 8px}
+.ctrl input{flex:1;accent-color:var(--green);height:28px}
+.months{display:flex;justify-content:space-between;font-size:13px;font-weight:800;color:var(--muted);padding:0 0 0 110px}
+.months span.on{color:var(--green)}
+.stage-txt{margin-top:12px;background:var(--green2);border-radius:16px;padding:14px 18px;min-height:84px}
+.stage-txt b{font-family:Rubik,Nunito,system-ui,sans-serif}
+
+/* quiz */
+.quiz{padding:22px;display:grid;gap:16px}
+.q{border:1px solid var(--line);border-radius:16px;padding:14px 16px;background:#fffefa}
+.q p{margin:0 0 10px;font-weight:800}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{cursor:pointer;font:inherit;font-size:15px;font-weight:700;border:2px solid var(--line);background:#fff;border-radius:12px;padding:8px 12px;text-align:left;color:var(--ink)}
+.opt.ok{background:#e4f3dc;border-color:var(--green);color:#20521c}
+.opt.bad{background:#fbe3dd;border-color:#b6452f;color:#7c2615}
+.q .why{margin-top:10px;font-size:15px;color:var(--muted);display:none}
+.q.answered .why{display:block}
+.score{font-family:Rubik,Nunito,system-ui,sans-serif;font-weight:800;font-size:20px}
+footer{padding:20px 0 40px;color:var(--muted);font-size:14px}
+@media (max-width:860px){
+  .idea,.ways,.grow-grid{grid-template-columns:1fr}
+  .lab{grid-template-columns:1fr}
+  .panel{grid-template-columns:1fr}
+  .stage{border-right:none;border-bottom:1px solid var(--line)}
+  .sec-head p{margin-left:0}
+  .months{padding:0 4px}
+  .stop{font-size:11px}
+}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+<header class="wrap">
+  <span class="tag">Биология · 6 класс · § 7 · Строение семян</span>
+  <h1>Что спрятано внутри семени?</h1>
+  <p>Каждое семя - это будущее растение, которое «упаковали» и дали ему еду в дорогу. Разберём, как устроена эта упаковка у фасоли, тыквы, яблони и пшеницы.</p>
+</header>
+
+<main class="wrap">
+
+<section>
+  <div class="sec-head"><span class="num">1</span><h2>Главная идея: из чего состоит любое семя</h2></div>
+  <div class="idea">
+    <div class="card"><svg id="ic1" viewBox="0 0 200 120"></svg><h3>Семенная кожура</h3><p>Упаковка. Защищает то, что внутри, от высыхания и повреждений.</p></div>
+    <div class="card"><svg id="ic2" viewBox="0 0 200 120"></svg><h3>Зародыш</h3><p>Зачаток будущего растения. У него есть корешок, стебелёк, почечка и семядоли (первые листья).</p></div>
+    <div class="card"><svg id="ic3" viewBox="0 0 200 120"></svg><h3>Запас питательных веществ</h3><p>Еда для зародыша. Лежит либо в самом зародыше (в семядолях), либо в особой ткани - эндосперме.</p></div>
+  </div>
+  <div class="analogy"><b>Зачем зародышу запас?</b> Пока у ростка нет корней и зелёных листьев, он не может добывать себе пищу сам. Поэтому растение-мама заранее кладёт в семя «обед с собой», как в рюкзак перед походом.</div>
+</section>
+
+<section id="lab">
+  <div class="sec-head"><span class="num">2</span><h2>Погружаемся внутрь семени</h2>
+    <p>Выбери семя и двигай ползунок вправо (или жми «Дальше»). Мы будем снимать слой за слоем, а в конце увидим, что вырастет из зародыша. Слева схема, справа так это выглядит в жизни: модель можно вращать. Подписи на схеме можно нажимать.</p></div>
+  <div class="tabs" id="tabs"></div>
+  <div class="card lab">
+    <div class="stage">
+      <div class="vhd">Схема <small>части зародыша раскрашены, чтобы их различать</small></div>
+      <svg id="stage" viewBox="0 0 520 400" role="img" aria-label="Схема семени">
+        <defs>
+          <filter id="blur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="5"/></filter>
+          <filter id="blur2"><feGaussianBlur stdDeviation="2.5"/></filter>
+          <radialGradient id="gBeanT" cx=".62" cy=".3" r=".85"><stop offset="0" stop-color="#9a2a40"/><stop offset=".45" stop-color="#5e1426"/><stop offset="1" stop-color="#2c0711"/></radialGradient>
+          <radialGradient id="gGrain" cx=".42" cy=".3" r=".85"><stop offset="0" stop-color="#e0bf62"/><stop offset=".55" stop-color="#b89032"/><stop offset="1" stop-color="#7a5a1a"/></radialGradient>
+          <radialGradient id="gApple" cx=".6" cy=".35" r=".75"><stop offset="0" stop-color="#9a5a2e"/><stop offset=".6" stop-color="#5e2c12"/><stop offset="1" stop-color="#341707"/></radialGradient>
+          <radialGradient id="gPump" cx=".45" cy=".35" r=".8"><stop offset="0" stop-color="#fdf9ec"/><stop offset="1" stop-color="#e3cf9e"/></radialGradient>
+          <pattern id="pEndo" width="14" height="14" patternUnits="userSpaceOnUse"><rect width="14" height="14" fill="#fff1c4"/><circle cx="4" cy="4" r="1.7" fill="#ecd99a"/><circle cx="11" cy="10" r="1.4" fill="#ecd99a"/></pattern>
+        </defs>
+        <g id="sv"></g>
+        <g id="labels"></g>
+      </svg>
+      <div class="legend" id="legend"></div>
+    </div>
+    <div class="v3d" id="v3wrap">
+      <div class="vhd">Как это выглядит в жизни <small>3D: крути пальцем или мышкой, приближай колёсиком</small></div>
+      <canvas id="c3d"></canvas>
+      <div class="v3fail" id="v3fail" hidden>3D-модель не загрузилась. Проверь интернет и обнови страницу.</div>
+    </div>
+    <div class="depth full">
+      <input type="range" id="dslider" min="0" max="400" value="0" aria-label="Глубина">
+      <div class="stops" id="stops"></div>
+    </div>
+    <div class="panel full">
+      <div class="ptext">
+        <div class="kicker" id="kicker"></div>
+        <h3 id="stTitle"></h3>
+        <p class="txt" id="stText"></p>
+        <button class="chip" id="iodBtn" hidden>Опыт: капнуть йодом</button>
+      </div>
+      <div class="pside">
+        <div class="info empty" id="info">Нажми на подпись на схеме, чтобы узнать подробнее.</div>
+        <div class="nav">
+          <button class="btn ghost" id="prev">← Назад</button>
+          <button class="btn go" id="next">Дальше →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="ways">
+  <div class="sec-head"><span class="num">3</span><h2>Где лежит запас: два варианта</h2></div>
+  <div class="ways">
+    <div class="card"><h3>В самом зародыше, в семядолях</h3><svg id="wayA" viewBox="140 120 240 190"></svg>
+      <p>Семядоли толстые, как подушки: в них и лежит еда. Эндосперма нет или почти нет.</p>
+      <p><b>Примеры:</b> фасоль, тыква, стрелолист, частуха. У яблони и миндаля от эндосперма остался лишь тонкий слой клеток.</p></div>
+    <div class="card"><h3>В эндосперме</h3><svg id="wayB" viewBox="140 40 260 330"></svg>
+      <p>Эндосперм - особая запасающая ткань, «кладовая» рядом с зародышем. Зародыш маленький, а эндосперм занимает почти всё семя.</p>
+      <p><b>Примеры:</b> пшеница, лук, кукуруза, а ещё ясень, лён, паслён.</p></div>
+  </div>
+  <div class="note"><b>Не перепутай!</b> Двудольные и однодольные растения различаются <b>числом семядолей</b> в зародыше: у двудольных две (фасоль, горох, яблоня, тыква), у однодольных одна (пшеница, лук, кукуруза). А запас у двудольных бывает и в семядолях, и в эндосперме (как у льна или паслёна). У однодольных он, как правило, в эндосперме.</div>
+</section>
+
+<section id="grow">
+  <div class="sec-head"><span class="num">4</span><h2>Как зародыш яблони «съедает» эндосперм</h2>
+    <p>Пока семя созревает внутри яблока, зародыш яблони разрастается так сильно, что вытесняет и поглощает эндосперм. У пшеницы этого не происходит. Двигай ползунок и сравни.</p></div>
+  <div class="card grow">
+    <div class="grow-grid">
+      <div class="gpanel"><h3>Семя яблони <small>в разрезе</small></h3><svg id="gA" viewBox="0 0 300 220"></svg><div class="bars" id="barsA"></div></div>
+      <div class="gpanel"><h3>Зерновка пшеницы <small>в разрезе</small></h3><svg id="gW" viewBox="0 0 300 220"></svg><div class="bars" id="barsW"></div></div>
+    </div>
+    <div class="ctrl">
+      <button class="btn" id="play" style="padding:10px 16px">▶ Пуск</button>
+      <input type="range" id="tslider" min="0" max="1000" value="0" aria-label="Время созревания">
+    </div>
+    <div class="months" id="months"><span>июнь</span><span>июль</span><span>август</span><span>сентябрь</span></div>
+    <div class="stage-txt" id="growTxt"></div>
+  </div>
+  <div class="remember"><b>Главное запомнить.</b> Семя состоит из <b>семенной кожуры</b> и <b>зародыша</b> и содержит <b>запас питательных веществ</b>. В зародыше различают <b>корешок, стебелёк, почечку и семядоли</b>. Семядоли - первые листья зародыша. Запас лежит в <b>эндосперме</b> или в самом зародыше. <b>Двудольные</b>: две семядоли. <b>Однодольные</b>: одна.</div>
+</section>
+
+<section id="quiz">
+  <div class="sec-head"><span class="num">5</span><h2>Проверь себя</h2><span class="score" id="score"></span></div>
+  <div class="card quiz" id="quizBox"></div>
+</section>
+</main>
+<footer class="wrap">По материалам учебника «Биология. 6 класс» под ред. В. В. Пасечника, § 7 «Строение семян». Рисунки схематичные, части зародыша раскрашены условными цветами.</footer>
+
+<script>
+const COL={cot:"#f2c14e",cotS:"#b8861a",cotIn:"#e9ad38",root:"#d9825b",rootS:"#9c5534",stem:"#a8d672",stemS:"#5f9a3a",bud:"#3f9a4f",budS:"#22643a",endoS:"#d9bd6a"};
+let V3=null;
+const cl=x=>Math.max(0,Math.min(1,x)), sm=x=>x*x*(3-2*x), seg=(d,a,b)=>sm(cl((d-a)/(b-a)));
+function hex(c){return[1,3,5].map(i=>parseInt(c.slice(i,i+2),16));}
+function mix(a,b,t){const A=hex(a),B=hex(b);return"rgb("+A.map((v,i)=>Math.round(v+(B[i]-v)*t)).join(",")+")";}
+const $=id=>document.getElementById(id);
+const NS="http://www.w3.org/2000/svg";
+function el(tag,attrs){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);return e;}
+function rng(seed){return()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+
+/* ---------- shapes ---------- */
+const BV="M300,70 C360,80 385,140 380,200 C375,270 340,335 280,335 C230,335 205,300 210,265 C213,240 228,225 226,200 C224,175 205,160 205,130 C205,90 250,62 300,70Z";
+const GV="M260,55 C330,55 362,110 362,190 C362,270 330,345 270,350 C255,351 245,345 235,335 C200,315 160,270 160,190 C160,110 190,55 260,55Z";
+const A="M110,200 C150,150 230,120 310,125 C380,130 420,165 420,205 C420,250 375,280 305,280 C225,282 150,250 110,200Z";
+const PV="M260,60 C330,60 370,120 368,200 C366,280 310,340 266,352 C262,353 258,353 254,352 C210,340 152,280 152,200 C150,120 190,60 260,60Z";
+const SPECK=(()=>{const r=rng(7);let o="";for(let i=0;i<70;i++){const x=200+r()*190,y=60+r()*285,rx=1.5+r()*5,ry=.8+r()*1.6,a=r()*180,op=.25+r()*.5;o+=`<ellipse cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="${rx.toFixed(1)}" ry="${ry.toFixed(1)}" transform="rotate(${a.toFixed(0)} ${x.toFixed(1)} ${y.toFixed(1)})" fill="#efc9d3" opacity="${op.toFixed(2)}"/>`;}return o;})();
+const shadow=(cx,cy,rx)=>`<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="11" fill="#3a2a10" opacity=".18" filter="url(#blur)"/>`;
+const fillP=(k)=>`fill="${COL[k]}" stroke="${COL[k+"S"]}" stroke-width="1.8"`;
+
+/* ---------- plant (embryo straightened -> seedling) ---------- */
+const COTSHAPE={kidney:"M0,0 C8,-26 58,-40 88,-22 C104,-10 100,16 78,22 C50,28 14,18 0,0Z",oval:"M0,0 C14,-26 66,-34 92,-14 C104,-2 96,18 74,22 C44,26 12,16 0,0Z"};
+const LEAF="M0,0 C-9,-14 -9,-34 0,-48 C9,-34 9,-14 0,0Z";
+function geo(g){const yb=245+35*g,Lr=45+60*g,Ls=30+120*g,yN=yb-Ls,Le=4+30*g,yT=yN-Le,Ll=18+45*g,ang=18+30*g;return{yb,Lr,yN,yT,Ll,ang};}
+function plant(g,p){
+  const G=geo(g),x=260,rw=5+2*g,sw=4+1.5*g;
+  const wilt=p.end==="wilt";
+  const sc=wilt?1-.4*g:1-.1*g;
+  const cf=wilt?mix(COL.cot,"#cdbf62",g):mix(COL.cot,"#86c25a",g);
+  const cs=wilt?mix(COL.cotS,"#8f8a3a",g):mix(COL.cotS,"#3f7d2a",g);
+  let o=`<g opacity="${seg(g,0,.35)}"><rect x="0" y="280" width="520" height="120" fill="#b08355" opacity=".35"/><path d="M0,280 H520" stroke="#7a5233" stroke-width="3"/></g>`;
+  const tip=G.yb+G.Lr;
+  const so=seg(g,.3,.8);
+  if(so>0)[.35,.55,.75].forEach(f=>{const y=G.yb+G.Lr*f,l=(10+28*g)*(1-f*.5)*so;o+=`<path d="M${x},${y} l${-l},${l*.7} M${x},${y+8} l${l},${l*.7}" stroke="${COL.root}" stroke-width="2" stroke-linecap="round" fill="none"/>`;});
+  o+=`<path d="M${x-rw},${G.yb} C${x-rw},${G.yb+G.Lr*.6} ${x-1.5},${tip-G.Lr*.05} ${x},${tip} C${x+1.5},${tip-G.Lr*.05} ${x+rw},${G.yb+G.Lr*.6} ${x+rw},${G.yb}Z" ${fillP("root")}/>`;
+  o+=`<path d="M${x-sw},${G.yb} L${x-sw*.9},${G.yN} L${x+sw*.9},${G.yN} L${x+sw},${G.yb}Z" ${fillP("stem")}/>`;
+  const rot=-8-10*g, sh=COTSHAPE[p.shape];
+  o+=`<g transform="translate(${x},${G.yN}) scale(${sc})"><path d="${sh}" transform="rotate(${rot})" fill="${cf}" stroke="${cs}" stroke-width="2"/><path d="${sh}" transform="scale(-1,1) rotate(${rot})" fill="${cf}" stroke="${cs}" stroke-width="2"/></g>`;
+  const ew=1.6+.8*g;
+  o+=`<path d="M${x-ew},${G.yN} L${x-ew},${G.yT} L${x+ew},${G.yT} L${x+ew},${G.yN}Z" fill="${COL.bud}"/>`;
+  const s=G.Ll/48;
+  [-1,1].forEach(k=>{o+=`<g transform="translate(${x},${G.yT}) rotate(${k*G.ang}) scale(${s})"><path d="${LEAF}" ${fillP("bud")} stroke-width="${1.8/s}"/><path d="M0,-4 L0,-42" stroke="${COL.budS}" stroke-width="${1/s}"/></g>`;});
+  return o;
+}
+function wheatPlant(g){
+  let o=`<g opacity="${seg(g,0,.3)}"><rect x="0" y="280" width="520" height="120" fill="#b08355" opacity=".35"/><path d="M0,280 H520" stroke="#7a5233" stroke-width="3"/></g>`;
+  const L=15+60*g;
+  [-28,0,26].forEach((a,i)=>{const r=a*Math.PI/180,l=L*(i===1?1:.8);o+=`<path d="M255,318 q${Math.sin(r)*l*.3},${l*.5} ${Math.sin(r)*l},${Math.cos(r)*l}" stroke="${COL.root}" stroke-width="${3+g}" fill="none" stroke-linecap="round"/>`;});
+  const H=20+200*g;
+  o+=`<path d="M257,300 C255,${300-H*.5} 258,${300-H*.9} 268,${300-H} C267,${300-H*.6} 266,${300-H*.3} 266,300Z" ${fillP("bud")}/>`;
+  if(g>.5){const H2=(H-60)*.7;o+=`<path d="M264,${300-H*.35} C276,${300-H*.35-H2*.5} 292,${300-H*.35-H2*.8} 300,${300-H*.35-H2}" stroke="${COL.bud}" stroke-width="7" fill="none" stroke-linecap="round" opacity="${seg(g,.5,.8)}"/>`;}
+  o+=`<g transform="translate(252,306) rotate(-65) scale(.3) translate(-261,-203)"><path d="${GV}" fill="#b89032" stroke="#6e5418" stroke-width="5"/><g transform="translate(18.3,14) scale(.93)"><path d="${GV}" fill="url(#pEndo)" opacity="${1-.75*g}"/></g><path d="M226,214 C258,250 276,296 280,336 L264,339 C260,300 244,258 212,226Z" ${fillP("cot")} stroke-width="5"/></g>`;
+  return o;
+}
+
+/* ---------- side-view seeds ---------- */
+const BEANAXIS={
+ rad:`<path d="M236,196 C228,215 222,232 218,252 C222,258 230,256 232,250 C236,232 242,216 246,200Z" ${fillP("root")}/>`,
+ stem:`<path d="M236,196 C238,186 242,178 248,172 L256,178 C250,184 248,192 246,200Z" ${fillP("stem")}/>`,
+ bud:`<path d="M252,175 C262,150 285,135 305,135 C298,155 278,172 254,180Z" ${fillP("bud")}/><path d="M254,180 C272,165 300,160 314,166 C300,180 276,186 256,184Z" ${fillP("bud")}/>`};
+const PUMPAXIS={
+ rad:`<path d="M252,305 C252,322 256,336 260,346 C264,336 268,322 268,305Z" ${fillP("root")}/>`,
+ stem:`<path d="M253,305 L254,282 L266,282 L267,305Z" ${fillP("stem")}/>`,
+ bud:`<path d="M260,284 C248,270 246,254 254,244 C262,254 264,270 260,284Z" ${fillP("bud")}/><path d="M260,284 C272,270 274,254 266,244 C258,254 256,270 260,284Z" ${fillP("bud")}/>`};
+const APPLEAXIS={
+ rad:`<path d="M114,200 C126,192 146,190 160,193 L160,207 C146,210 126,208 114,200Z" ${fillP("root")}/>`,
+ stem:`<path d="M160,193 L182,194 L182,206 L160,207Z" ${fillP("stem")}/>`,
+ bud:`<path d="M182,200 C192,188 206,186 216,190 C208,199 194,202 182,200Z" ${fillP("bud")}/><path d="M182,200 C192,212 206,214 216,210 C208,201 194,198 182,200Z" ${fillP("bud")}/>`};
+
+const SEEDS={
+bean:{name:"Фасоль",sub:"двудольное",type:"side",O:BV,oc:"translate(14.75,9.9) scale(.95)",ax:BEANAXIS,cen:[295,200],plant:{shape:"kidney",end:"wilt"},
+ icon:`<path transform="translate(-8,-6) scale(.13)" d="${BV}" fill="url(#gBeanT)"/>`,
+ coat:`${shadow(292,350,90)}<clipPath id="cpB"><path d="${BV}"/></clipPath><path d="${BV}" fill="url(#gBeanT)" stroke="#250510" stroke-width="2"/><g clip-path="url(#cpB)">${SPECK}</g><path d="M298,88 C342,98 364,140 362,196" stroke="#fff" stroke-opacity=".3" stroke-width="12" fill="none" stroke-linecap="round" filter="url(#blur2)"/><ellipse cx="236" cy="200" rx="6" ry="26" fill="#f6efe2" stroke="#3a0b16" stroke-width="1.5"/><path d="M236,180 L236,220" stroke="#9b8a74" stroke-width="1.4"/>`,
+ legendCoat:"#5e1426",
+ stops:[
+  {n:"Снаружи",h:"Семя фасоли снаружи",x:"Снаружи семя покрыто семенной кожурой. Она прочная и защищает то, что внутри, от высыхания и повреждений. Светлое пятнышко на вогнутом боку - рубчик: тут семя крепилось к стенке боба.",
+   L:[{t:"Семенная кожура",k:"coat",p:[335,250],l:[440,320]},{t:"Рубчик",k:"hilum",p:[236,200],l:[110,150]}]},
+  {n:"Без кожуры",h:"Снимаем кожуру",x:"Кожура легко снимается, если семя полежало в воде. Всё, что под ней, - это зародыш, будущее растение. Почти всё место занимают две толстые половинки - семядоли. Они плотно сложены вместе, как половинки арахиса. Снаружи виден только корешок.",
+   L:[{t:"Семядоля",k:"cotBean",p:[320,180],l:[440,110]},{t:"Корешок",k:"root",p:[226,238],l:[110,290]}]},
+  {n:"Между семядолями",h:"Заглянем между семядолями",x:"Сделаем верхнюю семядолю прозрачной. Между семядолями спрятан маленький росток: корешок, стебелёк и почечка с крошечными листочками. Семядоли тоже часть зародыша: это его первые листья. Они такие толстые, потому что в них запас питательных веществ.",
+   L:[{t:"Почечка",k:"bud",p:[285,155],l:[420,60]},{t:"Стебелёк",k:"stem",p:[248,184],l:[110,130]},{t:"Корешок",k:"root",p:[226,238],l:[110,290]},{t:"Семядоля",k:"cotBean",p:[330,240],l:[440,320]}]},
+  {n:"Расправим",h:"Расправим зародыш",x:"Раскроем семядоли, как книжку, и поставим зародыш вертикально. Теперь видно, что это настоящее маленькое растение: внизу корешок, выше стебелёк, по бокам две семядоли, сверху почечка. Семядолей две, значит, фасоль - двудольное растение.",L:"plant0"},
+  {n:"Что вырастет",h:"Что вырастет из зародыша",x:"Семя проросло! Корешок стал корнем, стебелёк - стеблем, а из почечки вырос побег с настоящими листьями. Семядоли отдали ростку весь свой запас, сморщились и скоро засохнут. Эндосперма у фасоли нет: вся еда была в семядолях.",L:"plant1"}]},
+pump:{name:"Тыква",sub:"двудольное",type:"side",O:PV,oc:"translate(18.2,14.4) scale(.93)",ax:PUMPAXIS,cen:[260,206],plant:{shape:"oval",end:"green"},
+ icon:`<path transform="translate(-3.8,-6.8) scale(.13)" d="${PV}" fill="url(#gPump)" stroke="#a89060" stroke-width="12"/>`,
+ coat:`${shadow(262,362,105)}<path d="${PV}" fill="url(#gPump)" stroke="#bfa772" stroke-width="2"/><g transform="translate(26,20.6) scale(.9)"><path d="${PV}" fill="none" stroke="#d6c08a" stroke-width="3" opacity=".8"/></g><path d="M215,95 C190,125 182,175 188,230" stroke="#fff" stroke-opacity=".8" stroke-width="14" fill="none" stroke-linecap="round" filter="url(#blur2)"/><ellipse cx="260" cy="344" rx="6" ry="4" fill="#a88a52"/>`,
+ legendCoat:"#e3cf9e",
+ stops:[
+  {n:"Снаружи",h:"Семя тыквы снаружи",x:"То самое семечко, которое грызут. Снаружи плотная светлая семенная кожура с ободком по краю. На остром конце рубчик. (Это задание 7 из учебника: рассмотри семя тыквы.)",
+   L:[{t:"Семенная кожура",k:"coat",p:[320,150],l:[440,70]},{t:"Рубчик",k:"hilum",p:[260,344],l:[390,375]}]},
+  {n:"Без кожуры",h:"Снимаем кожуру",x:"Под кожурой (и тонкой зелёной плёнкой, она тоже относится к кожуре) только зародыш. Эндосперма у тыквы нет. Две большие семядоли сложены вместе. Именно их мы и едим, когда грызём семечки: в них запас питательных веществ, в основном масло.",
+   L:[{t:"Семядоля",k:"cotPump",p:[300,180],l:[440,90]},{t:"Корешок",k:"root",p:[260,330],l:[390,370]}]},
+  {n:"Между семядолями",h:"Заглянем между семядолями",x:"Сделаем верхнюю семядолю прозрачной. У острого конца лежат корешок, стебелёк и крошечная почечка. Всё остальное место заняли семядоли.",
+   L:[{t:"Почечка",k:"bud",p:[260,262],l:[110,190]},{t:"Стебелёк",k:"stem",p:[260,294],l:[110,280]},{t:"Корешок",k:"root",p:[260,330],l:[390,370]},{t:"Семядоля",k:"cotPump",p:[320,180],l:[440,90]}]},
+  {n:"Расправим",h:"Расправим зародыш",x:"Те же части, что у фасоли: корешок, стебелёк, почечка и две семядоли. Тыква тоже двудольное растение, и запас у неё тоже в самом зародыше, в семядолях.",L:"plant0"},
+  {n:"Что вырастет",h:"Что вырастет из зародыша",x:"Корешок стал корнем, стебелёк - стеблем, из почечки вырос побег. Семядоли тыквы выходят на свет, зеленеют и первое время работают как листья. На грядке их легко узнать: два гладких овальных листика внизу ростка.",L:"plant1"}]},
+apple:{name:"Яблоня",sub:"двудольное",type:"side",O:A,oc:"translate(18.55,14.2) scale(.93)",ax:APPLEAXIS,cen:[265,203],film:1,plant:{shape:"oval",end:"green"},
+ icon:`<path transform="translate(-9.75,-10.5) scale(.15)" d="${A}" fill="url(#gApple)"/>`,
+ coat:`${shadow(268,292,150)}<path d="${A}" fill="url(#gApple)" stroke="#2e1407" stroke-width="2.5"/><path d="M180,165 C230,138 300,132 360,148" stroke="#fff" stroke-opacity=".4" stroke-width="12" fill="none" stroke-linecap="round" filter="url(#blur2)"/><ellipse cx="119" cy="200" rx="10" ry="5.5" fill="#c9a27a" stroke="#2e1407" stroke-width="1.5"/>`,
+ legendCoat:"#5e2c12",
+ stops:[
+  {n:"Снаружи",h:"Семечко яблока снаружи",x:"Снаружи твёрдая блестящая коричневая семенная кожура. На остром конце рубчик: здесь семя крепилось внутри яблока.",
+   L:[{t:"Семенная кожура",k:"coat",p:[330,145],l:[420,60]},{t:"Рубчик",k:"hilum",p:[119,200],l:[100,320]}]},
+  {n:"Без кожуры",h:"Снимаем кожуру",x:"Под кожурой тонкий беловатый слой. Это всё, что осталось от эндосперма! Пока семя созревало, зародыш разросся, вытеснил и поглотил эндосперм. Как это было, смотри в разделе 4.",
+   L:[{t:"Слой клеток эндосперма",k:"film",p:[300,131],l:[400,55]},{t:"Корешок",k:"root",p:[135,200],l:[100,320]}]},
+  {n:"Между семядолями",h:"Заглянем между семядолями",x:"Сделаем верхнюю семядолю прозрачной. У острого конца корешок, стебелёк и крошечная почечка. Почти всё остальное место заняли две большие семядоли с запасом.",
+   L:[{t:"Почечка",k:"bud",p:[204,200],l:[250,55]},{t:"Стебелёк",k:"stem",p:[171,200],l:[110,110]},{t:"Корешок",k:"root",p:[135,200],l:[100,320]},{t:"Семядоля",k:"cotApple",p:[330,230],l:[430,330]}]},
+  {n:"Расправим",h:"Расправим зародыш",x:"Яблоня - двудольное растение: у зародыша две семядоли. Запас питательных веществ у неё в семядолях, а не в эндосперме.",L:"plant0"},
+  {n:"Что вырастет",h:"Что вырастет из зародыша",x:"Из семечка вырастет маленькая яблонька. Семядоли выходят на свет и зеленеют, а из почечки растёт побег с листьями. Интересно, что яблоня из семечка обычно даёт мелкие кислые яблоки, поэтому садовые сорта размножают черенками и прививками.",L:"plant1"}]},
+wheat:{name:"Пшеница",sub:"однодольное",type:"wheat",
+ icon:`<path transform="translate(-3.9,-6.4) scale(.13)" d="${GV}" fill="url(#gGrain)"/>`,legendCoat:"#b89032",
+ stops:[
+  {n:"Снаружи",h:"Зерновка пшеницы снаружи",x:"Зерно пшеницы называют зерновкой. Снаружи её покрывает околоплодник, и он так плотно сросся с семенной кожурой, что их не разделить. Поэтому зерновка - это плод, а не просто семя. Снять кожуру не получится, так что разрежем зерновку вдоль.",
+   L:[{t:"Околоплодник",k:"pericarp",p:[330,130],l:[440,60]},{t:"Здесь зародыш",k:"embryo",p:[215,285],l:[100,350]}]},
+  {n:"Разрез",h:"Разрежем зерновку вдоль",x:"Почти всё внутри занимает эндосперм - особая запасающая ткань, «кладовая» с питательными веществами (в основном с крахмалом). Именно из эндосперма делают муку. Зародыш маленький, он лежит сбоку, у основания зерновки.",
+   L:[{t:"Околоплодник",k:"pericarp",p:[352,130],l:[445,55]},{t:"Эндосперм",k:"endo",p:[290,170],l:[445,160]},{t:"Зародыш",k:"embryo",p:[228,285],l:[100,350]}]},
+  {n:"Зародыш крупно",h:"Зародыш пшеницы под лупой",x:"Части те же: корешок, стебелёк, почечка. Но семядоля всего одна, поэтому пшеница - однодольное растение. Семядоля прижата к эндосперму. При прорастании она работает как трубочка в стакане сока: передаёт зародышу питательные вещества из эндосперма.",
+   L:[{t:"Почечка",k:"bud",p:[216.8,131],l:[90,80]},{t:"Стебелёк",k:"stem",p:[254.6,212],l:[90,220]},{t:"Корешок",k:"root",p:[300.5,311],l:[150,365]},{t:"Семядоля",k:"cotWheat",p:[351.8,247],l:[440,300]},{t:"Эндосперм",k:"endo",p:[427,112],l:[440,45]}]},
+  {n:"Что вырастет",h:"Что вырастет из зерновки",x:"Зерновка остаётся в земле. Из корешка растёт корень, из почечки - побег с узкими листьями. Семядоля наружу не выходит: она остаётся в зерновке и «перекачивает» ростку запас из эндосперма, пока он не кончится.",
+   L:[{t:"Листья (из почечки)",k:"bud",p:[262,150],l:[420,110]},{t:"Зерновка с эндоспермом",k:"endo",p:[252,306],l:[420,320]},{t:"Корень (из корешка)",k:"root",p:[256,350],l:[110,360]}]}]}
+};
+
+/* plant labels, computed from geometry */
+(function(){const g0=geo(0),g1=geo(1);
+ const M=(x,y)=>[260+1.6*(x-260),250+1.6*(y-250)];
+ SEEDS._plant0=(c)=>[{t:"Почечка",k:"bud",p:M(260,g0.yT-8),l:[260,70]},{t:"Семядоли",k:c,p:[M(205,g0.yN-4),M(315,g0.yN-4)],l:[110,110]},{t:"Стебелёк",k:"stem",p:M(260,(g0.yb+g0.yN)/2),l:[420,250]},{t:"Корешок",k:"root",p:M(260,g0.yb+g0.Lr/2),l:[420,330]}];
+ SEEDS._plant1=(c,wilt)=>[{t:"Листья (из почечки)",k:"bud",p:[284,g1.yT-22],l:[430,45]},{t:wilt?"Семядоли (запас потрачен)":"Семядоли (позеленели)",k:c,p:[300,g1.yN-4],l:[420,135]},{t:"Стебель (из стебелька)",k:"stem",p:[260,(g1.yb+g1.yN)/2+20],l:[420,230]},{t:"Корень (из корешка)",k:"root",p:[260,g1.yb+g1.Lr*.6],l:[420,345]}];
+})();
+const COTKEY={bean:"cotBean",pump:"cotPump",apple:"cotApple"};
+
+const INFO={
+ coat:["Семенная кожура","Покрывает семя снаружи и защищает зародыш от высыхания и повреждений."],
+ hilum:["Рубчик","След от семяножки. Этой «ножкой» семя крепилось к стенке плода и получало по ней питание."],
+ cotBean:["Семядоли","Первые листья зародыша. У фасоли их две, они толстые и мясистые, потому что в них запас питательных веществ. Растения с двумя семядолями называют двудольными."],
+ cotPump:["Семядоли","У тыквы зрелое семя состоит только из зародыша и кожуры. Запас (в основном масло) лежит в двух больших семядолях."],
+ cotApple:["Семядоли","Две большие семядоли заполняют почти всё семя яблони. Запас питательных веществ находится в них."],
+ cotWheat:["Семядоля","У зародыша пшеницы только одна семядоля. Растения с одной семядолей называют однодольными. Семядоля прижата к эндосперму и передаёт из него питательные вещества зародышу."],
+ root:["Корешок","Зародышевый корешок. Из него вырастет корень. При прорастании он первым выходит из семени."],
+ stem:["Стебелёк","Зародышевый стебелёк соединяет корешок с почечкой. Из него вырастет стебель."],
+ bud:["Почечка","Зародышевая почечка: верхушка зародыша с зачатками первых листьев. Из неё вырастет побег с листьями."],
+ embryo:["Зародыш","Зачаток будущего растения. В нём различают корешок, стебелёк, почечку и семядоли."],
+ pericarp:["Околоплодник","Стенка плода. У пшеницы он кожистый, золотисто-жёлтый и так плотно сросся с семенной кожурой, что их не разделить. Поэтому зерновка - это плод."],
+ endo:["Эндосперм","Особая запасающая ткань с запасом питательных веществ. У пшеницы, лука, ясеня, льна, паслёна эндосперм занимает почти весь объём семени."],
+ film:["Слой клеток эндосперма","У яблони зародыш ко времени созревания семени разрастается так, что вытесняет и поглощает эндосперм. Остаётся лишь небольшой слой клеток под семенной кожурой."]
+};
+
+/* ---------- build scenes ---------- */
+let cur="bean",d=0,anim=null,iod=false,lastStop=-1;
+function sideMarkup(c){
+  return `<g id="side">
+   <g transform="${c.oc}"><path d="${c.O}" fill="${COL.cotIn}" stroke="${COL.cotS}" stroke-width="2.5"/></g>
+   <g>${c.ax.stem}${c.ax.bud}</g>
+   <g transform="${c.oc}"><path id="cotT" d="${c.O}" fill="${COL.cot}" stroke="${COL.cotS}" stroke-width="2.5"/></g>
+   ${c.ax.rad}
+   ${c.film?`<path id="film" d="${c.O}" transform="translate(9.3,7.1) scale(.965)" fill="#fffaf0" fill-opacity=".55" stroke="#cdbb8c" stroke-width="2" stroke-dasharray="6 4"/>`:""}
+   <g id="coat">${c.coat}</g>
+  </g><g id="plantG"></g>`;
+}
+const W_EMB=`<path d="M176,250 C183,226 204,212 226,214 C258,250 276,296 280,336 C266,342 250,340 238,333 C204,314 184,288 176,250Z" fill="#fbeecb" stroke="#b48a2a" stroke-width="1.5"/>
+<path d="M226,214 C258,250 276,296 280,336 L264,339 C260,300 244,258 212,226Z" ${fillP("cot")}/>
+<path d="M198,240 C210,232 224,238 230,250 C224,256 212,258 202,258 C196,250 194,244 198,240Z" ${fillP("bud")}/>
+<path d="M202,258 C212,258 224,256 230,250 C236,268 242,284 247,298 C240,302 228,300 222,296 C214,282 208,270 202,258Z" ${fillP("stem")}/>
+<path d="M222,296 C228,300 240,302 247,298 C251,308 255,317 258,326 C252,334 242,333 238,326 C232,316 227,306 222,296Z" ${fillP("root")}/>`;
+function wheatMarkup(){
+  return `<g id="wOut">${shadow(262,355,95)}<path d="${GV}" fill="url(#gGrain)" stroke="#6e5418" stroke-width="2"/>
+   <path d="M226,80 C200,110 192,160 196,210" stroke="#fff" stroke-opacity=".35" stroke-width="12" fill="none" stroke-linecap="round" filter="url(#blur2)"/>
+   <path d="M182,262 C190,240 210,236 226,252 C240,272 250,300 252,330 C232,325 196,300 182,262Z" fill="#e2c776" opacity=".85" stroke="#8e7027" stroke-width="1.3"/></g>
+  <line id="wCut" x1="140" x2="380" stroke="#fff" stroke-width="3" opacity="0"/>
+  <g id="wSec"><path d="${GV}" fill="#b89032" stroke="#6e5418" stroke-width="2"/>
+   <g transform="translate(18.3,14) scale(.93)"><path d="${GV}" fill="url(#pEndo)"/><path id="wIod" d="${GV}" fill="#3d3590" opacity="0" style="transition:opacity 1s;mix-blend-mode:multiply"/></g>
+   ${W_EMB}</g><g id="wPl"></g>`;
+}
+
+function build(){
+  const c=SEEDS[cur];
+  $("sv").innerHTML=c.type==="side"?sideMarkup(c):wheatMarkup();
+  document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("on",t.dataset.k===cur));
+  const n=c.stops.length;
+  $("dslider").max=(n-1)*100;
+  $("stops").innerHTML="";
+  c.stops.forEach((s,i)=>{const b=document.createElement("button");b.className="stop";b.textContent=s.n;b.onclick=()=>animTo(i);$("stops").appendChild(b);});
+  const items=[[c.legendCoat,cur==="wheat"?"Околоплодник":"Семенная кожура"],[COL.cot,"Семядоли"],[COL.bud,"Почечка"],[COL.stem,"Стебелёк"],[COL.root,"Корешок"]];
+  if(cur==="wheat"||cur==="apple")items.push(["#fff1c4","Эндосперм"]);
+  $("legend").innerHTML=items.map(([c,t])=>`<span><i style="background:${c}"></i>${t}</span>`).join("")+`<span style="font-weight:600">цвета частей условные</span>`;
+  iod=false;$("iodBtn").classList.remove("on");$("iodBtn").textContent="Опыт: капнуть йодом";
+  lastStop=-1;if(V3)V3.setSeed(cur);update();
+}
+
+function update(){
+  const c=SEEDS[cur];
+  if(c.type==="side"){
+    const p=seg(d,.15,.85),cx=c.cen[0],cy=c.cen[1],sc=1+.08*p;
+    const coat=$("coat");coat.setAttribute("opacity",1-p);
+    coat.setAttribute("transform",`translate(${cx},${cy-25*p}) scale(${sc}) translate(${-cx},${-cy})`);
+    const t=seg(d,1.15,1.85),ct=$("cotT");
+    ct.setAttribute("fill-opacity",1-.88*t);
+    ct.setAttribute("stroke-dasharray",t>.03?"7 5":"none");
+    if(c.film)$("film").setAttribute("opacity",seg(d,.5,.9)*(1-seg(d,1.15,1.7)));
+    $("side").setAttribute("opacity",1-seg(d,2.15,2.7));
+    const pg=$("plantG");const po=seg(d,2.3,2.85);
+    pg.setAttribute("opacity",po);
+    const pgv=seg(d,3.05,3.95),S=1.6-.6*pgv;
+    pg.setAttribute("transform",`translate(260,250) scale(${S}) translate(-260,-250)`);
+    pg.innerHTML=po>0?plant(pgv,c.plant):"";
+  } else {
+    $("wOut").setAttribute("opacity",1-seg(d,.35,.85));
+    const cu=$("wCut"),k=cl((d-.05)/.6);const y=55+300*k;
+    cu.setAttribute("y1",y);cu.setAttribute("y2",y);cu.setAttribute("opacity",d>.05&&d<.7?.9:0);
+    const sec=$("wSec");sec.setAttribute("opacity",seg(d,.35,.85)*(1-seg(d,2.2,2.6)));
+    const z01=seg(d,1.1,1.9),z=1+1.7*z01,cx=228,cy=280;
+    sec.setAttribute("transform",`translate(${cx+(260-cx)*z01},${cy+(220-cy)*z01}) scale(${z}) translate(${-cx},${-cy})`);
+    $("wIod").setAttribute("opacity",iod?.7:0);
+    const pl=$("wPl"),po=seg(d,2.3,2.7);pl.setAttribute("opacity",po);
+    pl.innerHTML=po>0?wheatPlant(seg(d,2.4,3)):"";
+    $("iodBtn").hidden=!(d>.8&&d<2.2);
+  }
+  const st=Math.round(d/1)|0;
+  const near=Math.abs(d-Math.round(d));
+  $("labels").setAttribute("opacity",cl(1-near*5));
+  if(st!==lastStop){lastStop=st;showStop(st);}
+  $("dslider").value=Math.round(d*100);
+  if(V3)V3.update(d,iod);
+}
+
+function showStop(i){
+  const c=SEEDS[cur],s=c.stops[i];
+  $("kicker").textContent=`${c.name} · шаг ${i+1} из ${c.stops.length}`;
+  $("stTitle").textContent=s.h;$("stText").textContent=s.x;
+  document.querySelectorAll(".stop").forEach((b,j)=>b.classList.toggle("on",j===i));
+  $("prev").disabled=i===0;
+  const last=i===c.stops.length-1;
+  const keys=Object.keys(SEEDS).filter(k=>!k.startsWith("_"));
+  const nx=keys[(keys.indexOf(cur)+1)%keys.length];
+  $("next").textContent=last?"Следующее семя: "+SEEDS[nx].name+" →":"Дальше →";
+  let L=s.L;
+  if(L==="plant0")L=SEEDS._plant0(COTKEY[cur]);
+  if(L==="plant1")L=SEEDS._plant1(COTKEY[cur],c.plant.end==="wilt");
+  renderLabels(L);setInfo(null);
+}
+
+function renderLabels(Ls){
+  const lg=$("labels");lg.innerHTML="";
+  Ls.forEach((L,i)=>{
+    const g=el("g",{class:"lbl"});
+    const pts=Array.isArray(L.p[0])?L.p:[L.p];
+    pts.forEach(P=>g.appendChild(el("line",{x1:P[0],y1:P[1],x2:L.l[0],y2:L.l[1]})));
+    pts.forEach(P=>g.appendChild(el("circle",{cx:P[0],cy:P[1],r:5})));
+    const r=el("rect",{rx:14,class:"pill"}),tx=el("text",{x:L.l[0],y:L.l[1]+5,"text-anchor":"middle"});
+    tx.textContent=L.t;g.appendChild(r);g.appendChild(tx);lg.appendChild(g);
+    const bb=tx.getBBox(),w=bb.width+24;
+    let x=bb.x-12;if(x<2){x=2;}if(x+w>518){x=518-w;}
+    tx.setAttribute("x",x+w/2);
+    r.setAttribute("x",x);r.setAttribute("y",L.l[1]-14);r.setAttribute("width",w);r.setAttribute("height",28);
+    g.onclick=()=>{setInfo(L.k);document.querySelectorAll(".lbl").forEach((n,j)=>n.classList.toggle("act",j===i));};
+  });
+}
+function setInfo(k){
+  const b=$("info");
+  if(!k){b.className="info empty";b.textContent="Нажми на подпись на схеме, чтобы узнать подробнее.";return;}
+  b.className="info";b.innerHTML=`<b>${INFO[k][0]}</b>${INFO[k][1]}`;
+}
+function animTo(target){
+  cancelAnimationFrame(anim);
+  const from=d,dur=Math.min(1600,500+Math.abs(target-from)*700),t0=performance.now();
+  const step=now=>{const k=cl((now-t0)/dur);d=from+(target-from)*sm(k);update();if(k<1)anim=requestAnimationFrame(step);};
+  anim=requestAnimationFrame(step);
+}
+$("dslider").oninput=e=>{cancelAnimationFrame(anim);d=e.target.value/100;update();};
+$("next").onclick=()=>{const c=SEEDS[cur],i=Math.round(d);
+  if(i<c.stops.length-1)animTo(i+1);
+  else{const keys=Object.keys(SEEDS).filter(k=>!k.startsWith("_"));cur=keys[(keys.indexOf(cur)+1)%keys.length];d=0;build();}};
+$("prev").onclick=()=>{const i=Math.round(d);if(i>0)animTo(i-1);};
+$("iodBtn").onclick=()=>{iod=!iod;$("iodBtn").classList.toggle("on",iod);$("iodBtn").textContent=iod?"Смыть йод":"Опыт: капнуть йодом";update();
+  if(iod){const b=$("info");b.className="info";b.innerHTML="<b>Эндосперм посинел!</b>Йод окрашивает крахмал в сине-фиолетовый цвет. Значит, запас в эндосперме - это в основном крахмал. Такой опыт можно повторить дома на срезе зерна или картошки.";}};
+
+const tabsBox=$("tabs");
+Object.keys(SEEDS).filter(k=>!k.startsWith("_")).forEach(key=>{
+  const s=SEEDS[key],b=document.createElement("button");
+  b.className="tab";b.dataset.k=key;
+  b.innerHTML=`<svg viewBox="0 0 60 40">${s.icon}</svg><span>${s.name}<small>${s.sub}</small></span>`;
+  b.onclick=()=>{cur=key;d=0;build();};
+  tabsBox.appendChild(b);
+});
+build();
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{lastStop=-1;update();});
+
+/* ---------- 3D view ---------- */
+function make3D(){
+  if(!window.THREE||!THREE.OrbitControls)return null;
+  const T=THREE,canvas=$("c3d"),wrap=$("v3wrap");
+  let renderer;
+  try{renderer=new T.WebGLRenderer({canvas,antialias:true,alpha:true});}catch(e){return null;}
+  renderer.setPixelRatio(Math.min(2,window.devicePixelRatio||1));
+  renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;
+  renderer.outputEncoding=T.sRGBEncoding;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.08;
+  const scene=new T.Scene();
+  const camera=new T.PerspectiveCamera(32,1.3,.05,100);camera.position.set(0,1.3,4.3);
+  const controls=new T.OrbitControls(camera,canvas);
+  controls.enablePan=false;controls.enableDamping=true;controls.dampingFactor=.08;controls.minDistance=.8;controls.maxDistance=16;
+  controls.autoRotateSpeed=1.2;
+  let userBusy=false,idleT=null,lastStopAuto=true;
+  controls.addEventListener("start",()=>{userBusy=true;controls.autoRotate=false;clearTimeout(idleT);});
+  controls.addEventListener("end",()=>{idleT=setTimeout(()=>{userBusy=false;controls.autoRotate=lastStopAuto;},6000);});
+  scene.add(new T.HemisphereLight(0xfff7ea,0x8c7a5c,.8));
+  const sun=new T.DirectionalLight(0xffffff,1.15);sun.position.set(3,7,5);sun.castShadow=true;
+  sun.shadow.mapSize.set(1024,1024);Object.assign(sun.shadow.camera,{left:-5,right:5,top:6,bottom:-5,near:.5,far:30});sun.shadow.radius=5;sun.shadow.bias=-.0005;
+  scene.add(sun);
+  const fill=new T.DirectionalLight(0xffe7c4,.35);fill.position.set(-4,2,-3);scene.add(fill);
+  const rim=new T.DirectionalLight(0xffffff,.25);rim.position.set(0,3,-6);scene.add(rim);
+  const ground=new T.Mesh(new T.PlaneGeometry(40,40),new T.ShadowMaterial({opacity:.16}));
+  ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;scene.add(ground);
+
+  const R=rng(11);
+  function tex(w,h,draw){const c=document.createElement("canvas");c.width=w;c.height=h;draw(c.getContext("2d"),w,h);const t=new T.CanvasTexture(c);t.encoding=T.sRGBEncoding;t.anisotropy=4;return t;}
+  const mottle=(base,spot,n,a=.12)=>tex(256,256,(g,w,h)=>{g.fillStyle=base;g.fillRect(0,0,w,h);g.fillStyle=spot;for(let i=0;i<n;i++){g.globalAlpha=.04+R()*a;g.beginPath();g.arc(R()*w,R()*h,3+R()*16,0,7);g.fill();}g.globalAlpha=1;});
+  function deform(fn,ws=80,hs=60){const g=new T.SphereGeometry(1,ws,hs),p=g.attributes.position,v=new T.Vector3();for(let i=0;i<p.count;i++){v.fromBufferAttribute(p,i);fn(v);p.setXYZ(i,v.x,v.y,v.z);}g.computeVertexNormals();return g;}
+  const mesh=(g,m)=>{const o=new T.Mesh(g,m);o.castShadow=true;o.receiveShadow=true;return o;};
+  const lerp=(a,b,t)=>a+(b-a)*t;
+  const col=(m,a,b,t)=>m.color.copy(new T.Color(a)).lerp(new T.Color(b),t);
+
+  /* shared growth pieces */
+  const cylUp=new T.CylinderGeometry(1,1,1,18);cylUp.translate(0,.5,0);
+  const coneDown=new T.CylinderGeometry(1,.22,1,18);coneDown.translate(0,-.5,0);
+  function soilCup(){
+    const g=new T.Group();
+    const soilM=new T.MeshStandardMaterial({color:"#6e4b2e",roughness:1,transparent:true,opacity:.5,depthWrite:false});
+    const soil=new T.Mesh(new T.CylinderGeometry(1.15,1.0,2.2,48),soilM);soil.position.y=-1.1;g.add(soil);
+    const topM=new T.MeshStandardMaterial({map:mottle("#5a3b22","#2d1c0f",300,.3),roughness:1,transparent:true,opacity:.9});
+    const top=new T.Mesh(new T.CircleGeometry(1.15,48),topM);top.rotation.x=-Math.PI/2;top.position.y=-.002;top.receiveShadow=true;g.add(top);
+    const cupM=new T.MeshPhysicalMaterial({color:"#ffffff",roughness:.1,transparent:true,opacity:.14,depthWrite:false,side:T.DoubleSide});
+    const cupMesh=new T.Mesh(new T.CylinderGeometry(1.22,1.05,2.5,48,1,true),cupM);cupMesh.position.y=-1.0;g.add(cupMesh);
+    g.userData.set=k=>{g.visible=k>0.01;soilM.opacity=.5*k;topM.opacity=.9*k;cupM.opacity=.14*k;};
+    return g;
+  }
+
+  /* ---------- side seeds: bean, pumpkin, apple ---------- */
+  const beanFn=v=>{const y=v.y,r=Math.max(Math.sqrt(Math.max(0,1-y*y)),.02);v.x=v.x*.5*Math.pow(r,-.4)+.28*(1-y*y)-.15;v.z*=.36*Math.pow(r,-.3);v.y*=1.05;};
+  const pumpFn=v=>{const y=v.y,t=y<0?.5+.5*Math.pow(1+y,.65):1;v.x*=.62*t;v.z*=.17*t;v.y*=1.05;};
+  const appleFn=v=>{const y=v.y,t=y<0?.38+.62*Math.pow(1+y,.6):1;v.x*=.5*t;v.z*=.32*t;v.y*=1.05;};
+  const beanCoatTex=tex(512,256,(g,w,h)=>{g.fillStyle="#5c1424";g.fillRect(0,0,w,h);
+    for(let i=0;i<80;i++){g.fillStyle=`rgba(30,4,12,${.15+R()*.25})`;g.beginPath();g.ellipse(R()*w,R()*h,6+R()*20,3+R()*8,R()*3,0,7);g.fill();}
+    for(let i=0;i<300;i++){g.save();g.translate(R()*w,R()*h);g.rotate(R()*3.14);g.fillStyle=`rgba(${225+R()*30|0},${170+R()*50|0},${180+R()*50|0},${.2+R()*.5})`;g.beginPath();g.ellipse(0,0,2+R()*9,.8+R()*2.2,0,0,7);g.fill();g.restore();}});
+
+  const SEEDCFG={
+    bean:{coatFn:beanFn,cotFn:v=>{v.multiplyScalar(.95);beanFn(v);},hinge:"y",node:[-.25,.12],radTop:-.02,radX:-.29,radTilt:-.08,Lr0:.55,LrG:1.5,grow:2.0,
+      coatMat:new T.MeshPhysicalMaterial({map:beanCoatTex,roughness:.3,clearcoat:.8,clearcoatRoughness:.2,transparent:true}),
+      cotMap:mottle("#f0ddae","#c7a161",140),cot:"#ffffff",cotEnd:"#c8b866",cotScaleEnd:.62,groundY:-1.08,camTop:.85,camDist:10,
+      extra:(coat)=>{const h=mesh(deform(v=>{v.x*=.035;v.y*=.2;v.z*=.085;}),new T.MeshStandardMaterial({color:"#f2ecdc",roughness:.5}));h.position.set(-.33,0,0);coat.add(h);}},
+    pump:{coatFn:pumpFn,cotFn:v=>{v.multiplyScalar(.93);pumpFn(v);},hinge:"x",node:[0,-.74],radTop:-.8,radX:0,radTilt:0,Lr0:.2,LrG:1.6,grow:1.7,
+      coatMat:new T.MeshStandardMaterial({map:mottle("#efe2bf","#d2bb86",120),roughness:.55,transparent:true}),
+      film:{color:"#7c9a3e",opacity:.92},cotMap:mottle("#efecc6","#c9c78c",120),cot:"#ffffff",cotEnd:"#6aa53c",cotScaleEnd:1.25,groundY:-1.06,camTop:.6,camDist:7.8,
+      extra:(coat)=>{const r=mesh(deform(v=>{v.multiplyScalar(1.0);pumpFn(v);v.z*=.45;v.x*=1.03;v.y*=1.015;}),new T.MeshStandardMaterial({color:"#e3d3a6",roughness:.6,transparent:true}));coat.add(r);coat.userData.rim=r;}},
+    apple:{coatFn:appleFn,cotFn:v=>{v.multiplyScalar(.93);appleFn(v);},hinge:"x",node:[0,-.74],radTop:-.82,radX:0,radTilt:0,Lr0:.18,LrG:1.6,grow:1.7,
+      coatMat:new T.MeshPhysicalMaterial({map:mottle("#5e2d12","#2c1206",160,.2),roughness:.25,clearcoat:1,clearcoatRoughness:.15,transparent:true}),
+      film:{color:"#fffaf0",opacity:.6},cotMap:mottle("#f8f2e0","#e2d6b4",100),cot:"#ffffff",cotEnd:"#78ad48",cotScaleEnd:1.15,groundY:-1.06,camTop:.6,camDist:7.8}
+  };
+
+  function seedModel(o){
+    const root=new T.Group();scene.add(root);
+    const coat=new T.Group();root.add(coat);
+    coat.add(mesh(deform(o.coatFn),o.coatMat));
+    if(o.extra)o.extra(coat);
+    let filmM=null;
+    if(o.film){filmM=new T.MeshStandardMaterial({color:o.film.color,roughness:.5,transparent:true,opacity:0,depthWrite:false});root.add(new T.Mesh(deform(v=>{v.multiplyScalar(.985);o.coatFn(v);}),filmM));}
+    const node=new T.Group();node.position.set(o.node[0],o.node[1],0);root.add(node);
+    const cotM=new T.MeshStandardMaterial({map:o.cotMap,color:o.cot,roughness:.6});
+    const pivT=new T.Group(),pivB=new T.Group();node.add(pivT,pivB);
+    const cT=mesh(deform(v=>{o.cotFn(v);v.z=Math.max(v.z,.004);}),cotM),cB=mesh(deform(v=>{o.cotFn(v);v.z=Math.min(v.z,-.004);}),cotM);
+    cT.position.set(-o.node[0],-o.node[1],0);cB.position.copy(cT.position);pivT.add(cT);pivB.add(cB);
+    const stemM=new T.MeshStandardMaterial({color:"#efe3c0",roughness:.55});
+    const stem=mesh(cylUp,stemM);stem.position.set(o.node[0],o.radTop,0);root.add(stem);
+    const rootM=new T.MeshStandardMaterial({color:"#f4ebd3",roughness:.6});
+    const rad=mesh(coneDown,rootM);rad.position.set(o.radX,o.radTop,0);rad.rotation.z=o.radTilt;root.add(rad);
+    const lat=new T.Group();root.add(lat);
+    const latL=[];for(let i=0;i<8;i++){const m=mesh(coneDown,rootM);m.userData.f=.25+i*.09;m.userData.s=i%2?1:-1;m.userData.a=(i*1.7)%6.28;lat.add(m);latL.push(m);}
+    const plum=new T.Group();node.add(plum);
+    const leafM=new T.MeshStandardMaterial({color:"#dcd78f",roughness:.55,side:T.DoubleSide});
+    const epi=mesh(cylUp,stemM);plum.add(epi);
+    const leafGeo=deform(v=>{v.x*=.06;v.y*=.17;v.z*=.016;});leafGeo.translate(0,.17,0);
+    const leaves=[0,1].map(()=>{const p=new T.Group();p.add(mesh(leafGeo,leafM));plum.add(p);return p;});
+    const cup=soilCup();cup.position.set(0,o.radTop,0);root.add(cup);
+    const ex=o.hinge==="y";
+    const LA=ex?[[0,0,-1.0],[0,0,-1.35]]:[[0,0,.18],[0,0,-.18]];
+    const LB=ex?[[0,0,.9],[0,0,-.9]]:[[0,0,.9],[0,0,-.9]];
+    function update(d){
+      const p=seg(d,.15,.85);
+      coat.visible=p<.999;coat.scale.setScalar(1+.15*p);coat.position.y=.45*p;
+      o.coatMat.opacity=1-p;o.coatMat.depthWrite=p<.05;
+      if(coat.userData.rim){coat.userData.rim.material.opacity=1-p;}
+      if(filmM){filmM.opacity=o.film.opacity*seg(d,.55,.9)*(1-seg(d,1.1,1.5));}
+      const op=seg(d,1.15,1.85),st=seg(d,2.15,2.85),g=seg(d,3.05,3.95);
+      if(ex){pivT.rotation.y=(-145*op-5*st)*Math.PI/180;pivB.rotation.y=(-30*st)*Math.PI/180;node.rotation.y=0;}
+      else{pivT.rotation.x=(lerp(170*op,50,st))*Math.PI/180;pivB.rotation.x=(-50*st)*Math.PI/180;node.rotation.y=st*Math.PI/2;}
+      const ny=o.node[1]+o.grow*g;node.position.y=ny;
+      const r=lerp(ex?.05:.035,ex?.075:.06,g);
+      stem.scale.set(r,Math.max(.001,ny-o.radTop),r);col(stemM,"#efe3c0","#a9c96a",g);
+      const Lr=o.Lr0+o.LrG*g;rad.scale.set(r*.95,Lr,r*.95);
+      latL.forEach(m=>{const k=seg(g,.3,.9),f=m.userData.f;m.visible=k>0;m.position.set(o.radX,o.radTop-Lr*f,0);m.rotation.set(0,m.userData.a,m.userData.s*1.15);const len=(.55-.4*f)*k;m.scale.set(.012,Math.max(len,.001),.012);});
+      const cs=lerp(1,o.cotScaleEnd,g);pivT.scale.setScalar(cs);pivB.scale.setScalar(cs);
+      col(cotM,o.cot,o.cotEnd,g);
+      const q=Math.max(st*.35,g);
+      leaves.forEach((lp,i)=>{lp.rotation.set(lerp(LA[i][0],LB[i][0],q),0,lerp(LA[i][2],LB[i][2],q));const s=1+4.2*g;lp.scale.set(s,s,1+1.5*g);});
+      const el=.01+.45*g;epi.scale.set(r*.6,el,r*.6);leaves.forEach(lp=>lp.position.y=el);
+      col(leafM,"#dcd78f","#3f8a2c",seg(g,0,.6));
+      const soilK=seg(d,3.0,3.4);cup.userData.set(soilK);
+      ground.position.y=lerp(o.groundY,o.radTop-2.25,soilK);
+    }
+    function cam(d){const g=seg(d,3.05,3.95),op=seg(d,1.15,1.85),st=seg(d,2.15,2.85);const ty=ex?-.05:lerp(-.05,-.7,op*(1-st));return{t:new T.Vector3(0,lerp(ty,o.camTop,g),0),dist:lerp(ex?5.3:lerp(5.3,6.4,op*(1-st)),o.camDist,g)};}
+    return{root,update,cam};
+  }
+
+  /* ---------- wheat ---------- */
+  function wheatModel(){
+    const root=new T.Group();scene.add(root);
+    const grainFn=v=>{v.x*=.5;v.z*=.46;if(v.z<0){const gx=Math.abs(v.x)/.14;if(gx<1)v.z+=.1*(1-gx*gx)*Math.sqrt(Math.max(0,1-v.y*v.y));}};
+    const grainTex=tex(512,256,(g,w,h)=>{g.fillStyle="#c39a45";g.fillRect(0,0,w,h);for(let i=0;i<140;i++){g.strokeStyle=`rgba(${R()<.5?120:235},${R()<.5?85:200},40,${.06+R()*.12})`;g.lineWidth=1+R()*3;const x=R()*w;g.beginPath();g.moveTo(x,0);g.lineTo(x+(R()-.5)*8,h);g.stroke();}});
+    const gm=()=>new T.MeshStandardMaterial({map:grainTex,roughness:.5,transparent:true});
+    const whole=new T.Group();root.add(whole);
+    const gW=gm();whole.add(mesh(deform(grainFn),gW));
+    const emb=mesh(deform(v=>{v.x*=.17;v.y*=.16;v.z*=.06;}),new T.MeshStandardMaterial({color:"#c8a85a",roughness:.6}));emb.position.set(0,-.8,.25);emb.rotation.x=-.45;whole.add(emb);
+    const hairM=new T.MeshStandardMaterial({color:"#efe2ba",roughness:.6});
+    for(let i=0;i<12;i++){const a=i/12*6.28,h=mesh(cylUp,hairM);h.scale.set(.006,.13,.006);h.position.set(Math.cos(a)*.05,.97,Math.sin(a)*.05);h.rotation.set(Math.sin(a)*.5,0,-Math.cos(a)*.5);whole.add(h);}
+    const halfM=gm();
+    const halfL=new T.Group(),halfR=new T.Group();root.add(halfL,halfR);
+    halfL.add(mesh(deform(v=>{grainFn(v);v.x=Math.min(v.x,-.002);}),halfM));
+    halfR.add(mesh(deform(v=>{grainFn(v);v.x=Math.max(v.x,.002);}),halfM));
+    function outline(sign){const s=new T.Shape();for(let i=0;i<=120;i++){const t=i/120*Math.PI*2,y=Math.cos(t),q=Math.sin(t),z=q>0?.46*q:-.36*(-q);const u=sign*z*.998,vv=y*.998;i?s.lineTo(u,vv):s.moveTo(u,vv);}return s;}
+    function paintFace(iod){return tex(512,1024,(g,w,h)=>{
+      const P=(u,v)=>[(u+.5)*w,(1-(v*.5+.5))*h];
+      const path=(sc,cx)=>{g.beginPath();for(let i=0;i<=120;i++){const t=i/120*Math.PI*2,y=Math.cos(t)*sc,q=Math.sin(t),z=(q>0?.46*q:-.36*(-q))*sc+cx;const[x,yy]=P(z,y);i?g.lineTo(x,yy):g.moveTo(x,yy);}g.closePath();};
+      g.fillStyle="#a97b2c";g.fillRect(0,0,w,h);
+      path(1,0);g.fillStyle="#b88a36";g.fill();
+      path(.93,.03);g.fillStyle=iod?"#30296e":"#f4e4b8";g.fill();
+      g.save();path(.93,.03);g.clip();
+      for(let i=0;i<1800;i++){g.fillStyle=iod?`rgba(${40+R()*40|0},${30+R()*30|0},${110+R()*60|0},.5)`:`rgba(${225+R()*20|0},${210+R()*25|0},${170+R()*30|0},.35)`;g.beginPath();g.arc(R()*w,R()*h,1+R()*3,0,7);g.fill();}
+      g.restore();
+      const poly=(pts,fill,stroke,lw)=>{g.beginPath();pts.forEach((p,i)=>{const[x,y]=P(p[0],p[1]);i?g.lineTo(x,y):g.moveTo(x,y);});g.closePath();if(fill){g.fillStyle=fill;g.fill();}if(stroke){g.strokeStyle=stroke;g.lineWidth=lw||3;g.stroke();}};
+      poly([[.34,-.58],[.3,-.75],[.2,-.9],[.1,-.965],[.0,-.94],[-.04,-.84],[.05,-.68],[.18,-.58]],iod?"#e3cb85":"#efd894","#c9a44c",3);
+      g.beginPath();[[.19,-.56],[.06,-.68],[-.03,-.83],[.0,-.95]].forEach((p,i)=>{const[x,y]=P(p[0],p[1]);i?g.lineTo(x,y):g.moveTo(x,y);});g.strokeStyle="#ddb550";g.lineWidth=18;g.lineCap="round";g.stroke();
+      const ell=(u,v,ru,rv,f,s)=>{const[x,y]=P(u,v);g.beginPath();g.ellipse(x,y,ru*w,rv*h*.5,-.5,0,7);g.fillStyle=f;g.fill();g.strokeStyle=s;g.lineWidth=2;g.stroke();};
+      ell(.23,-.68,.04,.065,"#cbd185","#9da55a");
+      ell(.18,-.79,.032,.05,"#f1e6bf","#c9b277");
+      ell(.12,-.89,.03,.045,"#f8eed0","#c9b277");
+    });}
+    const faceTex=paintFace(false),faceTexI=paintFace(true);
+    [faceTex,faceTexI].forEach(t=>{t.repeat.set(1,.5);t.offset.set(.5,.5);});
+    const faceTexL=faceTex.clone(),faceTexLI=faceTexI.clone();
+    [faceTexL,faceTexLI].forEach(t=>{t.repeat.set(-1,.5);t.offset.set(.5,.5);t.needsUpdate=true;});
+    const fmR=new T.MeshStandardMaterial({map:faceTex,roughness:.8,transparent:true}),fmL=new T.MeshStandardMaterial({map:faceTexL,roughness:.8,transparent:true});
+    const fR=new T.Mesh(new T.ShapeGeometry(outline(1),1),fmR);fR.rotation.y=-Math.PI/2;fR.position.x=-.001;fR.receiveShadow=true;halfR.add(fR);
+    const fL=new T.Mesh(new T.ShapeGeometry(outline(-1),1),fmL);fL.rotation.y=Math.PI/2;fL.position.x=.001;fL.receiveShadow=true;halfL.add(fL);
+    /* seedling */
+    const sg=new T.Group();root.add(sg);
+    const gS=gm();const lying=mesh(deform(grainFn),gS);lying.rotation.z=Math.PI/2*.85;lying.scale.setScalar(.9);lying.position.set(0,-.2,0);sg.add(lying);
+    const rootM=new T.MeshStandardMaterial({color:"#f4ecd6",roughness:.6,transparent:true});
+    const roots=[[-.5,1.0],[0,1.3],[.6,1.05]].map(([bx,len])=>{const c=new T.CatmullRomCurve3([new T.Vector3(0,0,0),new T.Vector3(bx*.3,-.3*len,.05),new T.Vector3(bx*.7,-.7*len,-.05),new T.Vector3(bx,-len,0)]);const m=mesh(new T.TubeGeometry(c,24,.022,8),rootM);const gr=new T.Group();gr.add(m);gr.position.set(.82,-.3,0);sg.add(gr);return gr;});
+    const blade=(w)=>{const g=new T.PlaneGeometry(w,1,1,30);g.translate(0,.5,0);const p=g.attributes.position;for(let i=0;i<p.count;i++){const y=p.getY(i);p.setX(i,p.getX(i)*(1-.75*y*y)+.12*y*y);}g.computeVertexNormals();return g;};
+    const leafM=new T.MeshStandardMaterial({color:"#4f9a34",roughness:.5,side:T.DoubleSide,transparent:true});
+    const coleM=new T.MeshStandardMaterial({color:"#cfe3a3",roughness:.5,side:T.DoubleSide,transparent:true});
+    const cole=mesh(blade(.09),coleM);cole.position.set(.78,-.15,0);sg.add(cole);
+    const leaf1=mesh(blade(.11),leafM);leaf1.position.set(.8,-.15,0);sg.add(leaf1);
+    const leaf2=mesh(blade(.1),leafM);leaf2.position.set(.8,-.15,0);leaf2.rotation.y=2.3;sg.add(leaf2);
+    const cup=soilCup();cup.position.y=-.15;sg.add(cup);
+    let iodNow=null;
+    function update(d,iod){
+      whole.visible=d<.06;
+      const s=seg(d,.1,.85),ho=1-seg(d,2.1,2.4);
+      halfL.visible=halfR.visible=d>=.06&&ho>.01;
+      halfL.position.x=-.75*s;halfL.rotation.y=-Math.PI/2*s;halfR.position.x=.75*s;halfR.rotation.y=Math.PI/2*s;
+      halfM.opacity=fmR.opacity=fmL.opacity=ho;halfM.depthWrite=ho>.98;
+      if(iod!==iodNow){iodNow=iod;fmR.map=iod?faceTexI:faceTex;fmL.map=iod?faceTexLI:faceTexL;fmR.needsUpdate=fmL.needsUpdate=true;}
+      const so=seg(d,2.2,2.5),g=seg(d,2.35,3);
+      sg.visible=so>.01;[gS,rootM,leafM,coleM].forEach(m=>m.opacity=so);
+      roots.forEach(r=>r.scale.set(Math.max(g,.02),Math.max(g,.02),1));
+      cole.scale.set(1,.15+.6*g,1);leaf1.scale.set(1+.4*g,.1+2.5*g,1);leaf2.scale.set(1,Math.max(.01,1.9*seg(g,.4,1)),1);leaf2.visible=g>.4;
+      cup.userData.set(so);
+      ground.position.y=lerp(-1.02,-2.4,so);
+    }
+    function cam(d){const z=seg(d,1.1,1.9),g=seg(d,2.2,2.9);
+      const t0=new T.Vector3(0,0,0),t2=new T.Vector3(.9,-.76,0),t3=new T.Vector3(.4,.6,0);
+      const t=t0.clone().lerp(t2,z).lerp(t3,g);
+      return{t,dist:lerp(lerp(4.4,1.7,z),6.5,g)};}
+    return{root,update,cam};
+  }
+
+  const MODELS={bean:seedModel(SEEDCFG.bean),pump:seedModel(SEEDCFG.pump),apple:seedModel(SEEDCFG.apple),wheat:wheatModel()};
+  let curM=null,curKey=null;
+  const FRONT=new T.Vector3(0,.32,1).normalize();
+  function aim(k){
+    const c=curM.cam(lastD);
+    const dir=camera.position.clone().sub(controls.target).normalize();
+    dir.lerp(FRONT,k).normalize();
+    controls.target.copy(c.t);camera.position.copy(c.t).addScaledVector(dir,c.dist);
+  }
+  let lastD=0;
+  function size(){const w=wrap.clientWidth-20,h=Math.round(w*400/520);renderer.setSize(w,h,false);canvas.style.width=w+"px";canvas.style.height=h+"px";camera.aspect=w/h;camera.updateProjectionMatrix();}
+  window.addEventListener("resize",size);size();
+  let visible=true;
+  if("IntersectionObserver"in window)new IntersectionObserver(es=>{visible=es[0].isIntersecting;}).observe(canvas);
+  (function loop(){requestAnimationFrame(loop);if(!visible)return;controls.update();renderer.render(scene,camera);})();
+  return{
+    setSeed(k){curKey=k;for(const m in MODELS)MODELS[m].root.visible=m===k;curM=MODELS[k];curM.update(0,false);lastD=0;camera.position.set(0,1.3,4.3);controls.target.set(0,0,0);aim(1);},
+    update(d,iod){if(!curM)return;lastD=d;curM.update(d,iod);if(!userBusy)aim(.12);
+      const n=SEEDS[curKey].stops.length-1,st=Math.round(d),still=Math.abs(d-st)<.02;
+      lastStopAuto=still&&(st===0||st===n);if(!userBusy)controls.autoRotate=lastStopAuto;}
+  };
+}
+
+try{V3=make3D();}catch(e){console.error(e);V3=null;}
+if(V3){V3.setSeed(cur);V3.update(d,iod);}else{$("v3fail").hidden=false;$("c3d").style.display="none";}
+
+/* ---------- idea icons and "two ways" ---------- */
+$("ic1").innerHTML=`<g transform="translate(100,60) scale(.32) translate(-295,-200)"><path d="${BV}" fill="url(#gBeanT)" stroke="#250510" stroke-width="3"/><ellipse cx="236" cy="200" rx="6" ry="26" fill="#f6efe2"/></g>`;
+$("ic2").innerHTML=`<g transform="translate(100,64) scale(.55) translate(-260,-230)">${plant(0,{shape:"kidney",end:"wilt"})}</g>`;
+$("ic3").innerHTML=`<g transform="translate(42,58) scale(.3) translate(-261,-203)"><path d="${GV}" fill="#b89032"/><g transform="translate(18.3,14) scale(.93)"><path d="${GV}" fill="url(#pEndo)"/></g></g>
+<g transform="translate(148,58) scale(.45) translate(-260,-215)"><path d="${COTSHAPE.kidney}" transform="translate(260,215) rotate(-8)" fill="${COL.cot}" stroke="${COL.cotS}" stroke-width="2"/><path d="${COTSHAPE.kidney}" transform="translate(260,215) scale(-1,1) rotate(-8)" fill="${COL.cot}" stroke="${COL.cotS}" stroke-width="2"/></g>
+<text x="42" y="116" text-anchor="middle" font-family="Nunito,system-ui,sans-serif" font-size="11" font-weight="800" fill="#6e675a">в эндосперме</text>
+<text x="148" y="116" text-anchor="middle" font-family="Nunito,system-ui,sans-serif" font-size="11" font-weight="800" fill="#6e675a">или в семядолях</text>`;
+$("wayA").innerHTML=plant(0,{shape:"kidney",end:"wilt"})+`<text x="260" y="140" text-anchor="middle" font-family="Nunito,system-ui,sans-serif" font-size="15" font-weight="800" fill="#9a6512">запас здесь ↓</text>`;
+$("wayB").innerHTML=`<path d="${GV}" fill="#b89032" stroke="#6e5418" stroke-width="2"/><g transform="translate(18.3,14) scale(.93)"><path d="${GV}" fill="url(#pEndo)"/></g>${W_EMB}<text x="275" y="175" text-anchor="middle" font-family="Nunito,system-ui,sans-serif" font-size="17" font-weight="800" fill="#9a6512">запас здесь</text><text x="225" y="366" text-anchor="middle" font-family="Nunito,system-ui,sans-serif" font-size="16" font-weight="800" fill="#6e675a">↑ зародыш</text>`;
+
+/* ---------- growth ---------- */
+const AP="M0,0 C30,-40 100,-62 160,-58 C200,-54 220,-30 220,0 C220,32 196,56 155,58 C95,62 30,40 0,0Z";
+const GP="M0,0 C0,-50 60,-75 125,-75 C195,-75 240,-45 240,0 C240,45 195,75 125,75 C60,75 0,50 0,0Z";
+const EP="M0,0 C0,-30 30,-50 60,-45 C85,-30 85,30 60,45 C30,50 0,30 0,0Z";
+const pat=id=>`<defs><pattern id="${id}" width="12" height="12" patternUnits="userSpaceOnUse"><rect width="12" height="12" fill="#fff1c4"/><circle cx="3" cy="3" r="1.4" fill="#ecd99a"/><circle cx="9" cy="9" r="1.2" fill="#ecd99a"/></pattern></defs>`;
+const cap=id=>`<text id="${id}" x="150" y="212" text-anchor="middle" font-family="Nunito,system-ui,sans-serif" font-weight="800" font-size="11" fill="#6e675a"></text>`;
+$("gA").innerHTML=pat("pa")+`<g id="aSeed"><path id="aCoat" d="${AP}" stroke-width="3"/><g transform="translate(9,0) scale(.92)"><path d="${AP}" fill="url(#pa)"/></g>
+ <g id="aEmb"><path d="${AP}" fill="${COL.cot}" stroke="${COL.cotS}" stroke-width="2" vector-effect="non-scaling-stroke"/><path id="aSeam" d="M35,0 C90,-2 150,-2 205,0" stroke="${COL.cotS}" stroke-width="1.2" fill="none" vector-effect="non-scaling-stroke"/>
+ <path d="M0,0 C10,-6 25,-8 40,-6 L40,6 C25,8 10,6 0,0Z" fill="${COL.root}" stroke="${COL.rootS}" stroke-width="1.2" vector-effect="non-scaling-stroke"/></g></g>`+cap("aCap");
+$("gW").innerHTML=pat("pw")+`<g id="wSeedG"><path id="wCoatG" d="${GP}" stroke-width="3"/><g transform="translate(8,0) scale(.94)"><path d="${GP}" fill="url(#pw)"/></g>
+ <g id="wEmbG"><path d="${EP}" fill="${COL.cot}" stroke="${COL.cotS}" stroke-width="2" vector-effect="non-scaling-stroke"/></g></g>`+cap("wCap");
+function makeBars(id){$(id).innerHTML=`<div class="bar"><span>Эндосперм</span><div class="tr"><div class="fl" style="background:#ecd27a"></div></div><span class="v"></span></div><div class="bar"><span>Зародыш</span><div class="tr"><div class="fl" style="background:${COL.cot}"></div></div><span class="v"></span></div>`;}
+makeBars("barsA");makeBars("barsW");
+function setBars(id,e,z){const r=$(id).querySelectorAll(".bar");r[0].querySelector(".fl").style.width=e+"%";r[0].querySelector(".v").textContent=Math.round(e)+"%";r[1].querySelector(".fl").style.width=z+"%";r[1].querySelector(".v").textContent=Math.round(z)+"%";}
+const STAGES=[
+ {to:.25,m:0,h:"Июнь. Семя только формируется",x:"Внутри молодого семени почти всё место занимает эндосперм - запас питательных веществ. Зародыш пока крошечный. У яблони и у пшеницы всё похоже."},
+ {to:.5,m:1,h:"Июль. Зародыш растёт",x:"Зародыш питается эндоспермом и растёт. У яблони особенно быстро увеличиваются семядоли."},
+ {to:.8,m:2,h:"Август. Семядоли вытесняют эндосперм",x:"Семядоли яблони вытесняют и поглощают эндосперм: запас питательных веществ переходит в них. А у пшеницы зародыш остаётся маленьким, и эндосперм сохраняется."},
+ {to:1.01,m:3,h:"Сентябрь. Семя созрело",x:"У яблони семядоли заняли почти всё место, от эндосперма остался лишь небольшой слой клеток под семенной кожурой. Кожура стала коричневой и твёрдой. У пшеницы почти всю зерновку занимает эндосперм, а запас понадобится при прорастании."}];
+function drawGrow(t){
+  const s=.6+.4*sm(cl(t/.5)),c=sm(cl((t-.5)/.45));
+  $("aSeed").setAttribute("transform",`translate(${150-110*s},105) scale(${s})`);
+  $("aCoat").setAttribute("fill",mix("#dfeac6","#6b3518",c));$("aCoat").setAttribute("stroke",mix("#a9bf83","#2e1407",c));
+  const ga=sm(cl(t/.95)),k=.08+(.9-.08)*ga;
+  $("aEmb").setAttribute("transform",`translate(12,0) scale(${k})`);
+  $("aSeam").setAttribute("opacity",cl((ga-.3)/.3));
+  const aZ=4+88*ga;setBars("barsA",100-aZ,aZ);
+  $("aCap").textContent=t<.8?"молодое семя":"зрелое семя";
+  $("wSeedG").setAttribute("transform",`translate(${150-120*s*.92},105) scale(${s*.92})`);
+  $("wCoatG").setAttribute("fill",mix("#bcd88e","#d9a548",c));$("wCoatG").setAttribute("stroke",mix("#8aa860","#8a5a1c",c));
+  const gw=sm(cl(t/.9)),kw=.12+.38*gw;
+  $("wEmbG").setAttribute("transform",`translate(12,26) scale(${kw})`);
+  const wZ=2+6*gw;setBars("barsW",100-wZ,wZ);
+  $("wCap").textContent=t<.8?"молодая зерновка":"зрелая зерновка";
+  const S=STAGES.find(x=>t<x.to);
+  $("growTxt").innerHTML=`<b>${S.h}.</b> ${S.x}`;
+  document.querySelectorAll("#months span").forEach((m,i)=>m.classList.toggle("on",i===S.m));
+}
+const sl=$("tslider");let raf=null;
+function stopPlay(){if(raf){cancelAnimationFrame(raf);raf=null;$("play").textContent="▶ Пуск";}}
+sl.oninput=()=>{stopPlay();drawGrow(sl.value/1000);};
+$("play").onclick=()=>{if(raf){stopPlay();return;}let v=+sl.value;if(v>=1000)v=0;let last=performance.now();$("play").textContent="❚❚ Пауза";
+  const tick=now=>{v+=(now-last)/10;last=now;if(v>=1000){sl.value=1000;drawGrow(1);stopPlay();return;}sl.value=v;drawGrow(v/1000);raf=requestAnimationFrame(tick);};raf=requestAnimationFrame(tick);};
+drawGrow(0);
+
+/* ---------- quiz ---------- */
+const Q=[
+ {q:"Из каких частей состоит семя?",o:["Из семенной кожуры и зародыша, в нём есть запас питательных веществ","Только из зародыша","Из корня, стебля и листьев"],a:0,w:"Семя состоит из семенной кожуры, зародыша и содержит запас питательных веществ."},
+ {q:"Какие растения называют двудольными?",o:["У которых в зародыше семени две семядоли","У которых два семени в плоде","У которых две семенные кожуры"],a:0,w:"У фасоли, гороха, яблони зародыши семян имеют две семядоли. Такие растения называют двудольными."},
+ {q:"Какое из растений однодольное?",o:["Фасоль","Кукуруза","Яблоня"],a:1,w:"К однодольным относят пшеницу, лук, кукурузу: в зародыше их семени одна семядоля."},
+ {q:"Из какой части зародыша вырастет побег с листьями?",o:["Из корешка","Из почечки","Из рубчика"],a:1,w:"Из почечки вырастает побег, из стебелька стебель, из корешка корень."},
+ {q:"Почему у пшеницы правильнее говорить не «семя», а «зерновка»?",o:["Околоплодник плотно сросся с семенной кожурой","У неё нет зародыша","Она очень мелкая"],a:0,w:"Кожистый околоплодник так плотно сросся с семенной кожурой, что их не разделить. Это плод - зерновка."},
+ {q:"Что такое эндосперм?",o:["Первый лист зародыша","Особая запасающая ткань с питательными веществами","След от семяножки"],a:1,w:"Эндосперм - запасающая ткань. В нём находится запас питательных веществ."},
+ {q:"Где запас питательных веществ у фасоли и тыквы?",o:["В эндосперме","В семенной кожуре","В самом зародыше, в семядолях"],a:2,w:"У тыквы, фасоли, стрелолиста, частухи зрелое семя состоит только из зародыша и кожуры. Запас в семядолях."},
+ {q:"Что случилось с эндоспермом у семени яблони?",o:["Зародыш вытеснил и поглотил его, остался лишь слой клеток","Его никогда не было","Он превратился в кожуру"],a:0,w:"Ко времени созревания зародыш яблони разрастается так, что вытесняет и поглощает эндосперм."},
+ {q:"Подумай: в чём биологическая роль семян?",o:["Семена защищают цветок","Из семени развивается новое растение: так растения размножаются и расселяются","Семена нужны только как корм животным"],a:1,w:"Жизнь цветкового растения начинается с семени. В нём есть зародыш и запас питания под защитой кожуры, поэтому семя может переждать зиму или засуху и прорасти на новом месте."}];
+let score=0,answered=0;const qb=$("quizBox");
+Q.forEach((it,qi)=>{const dv=document.createElement("div");dv.className="q";
+  dv.innerHTML=`<p>${qi+1}. ${it.q}</p><div class="opts"></div><div class="why">${it.w}</div>`;
+  const ob=dv.querySelector(".opts");
+  it.o.forEach((o,oi)=>{const b=document.createElement("button");b.className="opt";b.textContent=o;
+    b.onclick=()=>{if(dv.classList.contains("answered"))return;dv.classList.add("answered");answered++;
+      if(oi===it.a){b.classList.add("ok");score++;}else{b.classList.add("bad");ob.children[it.a].classList.add("ok");}
+      $("score").textContent=`${score} из ${Q.length}`+(answered===Q.length?(score===Q.length?" · Отлично!":score>=7?" · Хорошо!":" · Перечитай § 7 и попробуй ещё раз"):"");};
+    ob.appendChild(b);});
+  qb.appendChild(dv);});
+const again=document.createElement("button");again.className="btn ghost";again.textContent="Пройти заново";again.style.justifySelf="start";
+again.onclick=()=>{score=0;answered=0;$("score").textContent="";qb.querySelectorAll(".q").forEach(q=>{q.classList.remove("answered");q.querySelectorAll(".opt").forEach(o=>o.className="opt");});};
+qb.appendChild(again);
+</script>
+</body>
+</html>
